@@ -44,6 +44,6 @@ public class PreparationType {
 
     @Override
     public String toString() {
-        return "PreparationType{" + "id=" + id + ", descrip=" + descrip + '}';
+        return this.descrip;
     }
 }

@@ -10,6 +10,7 @@ import bo.FoodBO;
 import entity.Food;
 import entity.FoodType;
 import entity.Nutrient;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JComboBox;
@@ -33,6 +34,8 @@ public class SearchFood extends javax.swing.JDialog {
     
     ArrayList<Food> foods = new ArrayList<>();
     
+    ArrayList<FoodType> foodTypes = new ArrayList<>();
+
     Food food = new Food();
     
     public SearchFood(java.awt.Frame parent, boolean modal) {
@@ -40,46 +43,63 @@ public class SearchFood extends javax.swing.JDialog {
         initComponents();
         this.setTitle("Buscar Valor Nutricional de Alimentos");
         this.setLocationRelativeTo(null);
-        fillCbxType(cbxFoodType);
+        initFoodType(cbxFoodType);
         fillCbxSearchBy(cbxSearchBy);
         
         initTable();
         search();
     }
 
-    public void search()
-    {
+    public void search(){
         FoodType foodType = (FoodType) cbxFoodType.getSelectedItem();
         int foodTypeId = foodType.getId();
-        String columnLabel = cbxSearchBy.getSelectedItem().toString();
+        String columnSearch = cbxSearchBy.getSelectedItem().toString();
         String column = "unknown";
-        if( columnLabel.equals("Descripcion")){
+        if( columnSearch.equals("Descripcion")){
             column = "descrip";
         }else{
-            for (HashMap<String, String> attribute : nutrients) {
-                if( attribute.get("label").equals(columnLabel)){
-                    column = attribute.get("column"); 
+            for (HashMap<String, String> nutrient : nutrients) {
+                String columnN = nutrient.keySet().toArray()[0].toString();
+                if( nutrient.get(columnN).equals(columnSearch)){
+                    column = columnN;
+                    break;
                 }
             }
         }
+        
         String search = txtSearch.getText();
-        foods = foodBO.search(column, search, foodTypeId);
+        foods = foodBO.searchWithNutrients(column, search, foodTypeId);
+        
         DefaultTableModel tblModel = (DefaultTableModel) tblResults.getModel();
         tblModel.setRowCount(0);
         
         String[] row = new String[nutrients.size()+1];
         int rowCount = 0;
         for (Food food : foods) {
-            int count = 0;
-            row[count] = food.getDescrip();
-            for (HashMap<String, String> attribute : nutrients) {
-                count++;
-                row[count] = food.getNutrients().get(attribute.get("column"));
+            row[0] = food.getDescrip();
+            for (int i = 0; i < nutrients.size(); i++) {
+                String columnN = nutrients.get(i).keySet().toArray()[0].toString();
+                row[i+1] = food.getNutrients().get(columnN);
             }
             tblModel.insertRow(rowCount, row);
             rowCount++;
         }
         tblResults.setModel(tblModel);
+    }
+    
+    public void initFoodType(JComboBox cbx){
+        cbx.removeAllItems();
+        foodTypes = foodTypeBO.list();
+        cbx.addItem(new FoodType(0, "Todos", null));
+        for (FoodType foodType : foodTypes)  cbx.addItem(foodType);
+    }
+    
+    public void fillCbxSearchBy(JComboBox cbx){
+        cbx.removeAllItems();
+        for (HashMap<String, String> nutrient : nutrients) {
+            String column = nutrient.keySet().toArray()[0].toString();
+            cbx.addItem(nutrient.get(column));
+        }
     }
     
     public void initTable()
@@ -88,8 +108,10 @@ public class SearchFood extends javax.swing.JDialog {
         
         headers[0] = "Descripcion";
         for (int i = 0; i < nutrients.size(); i++) {
-            headers[i+1] = nutrients.get(i).get("label");
+            String column = nutrients.get(i).keySet().toArray()[0].toString();
+            headers[i+1] = nutrients.get(i).get(column);
         }
+        
         
         DefaultTableModel tblModel = new DefaultTableModel(null, headers) {
             @Override
@@ -98,23 +120,8 @@ public class SearchFood extends javax.swing.JDialog {
             }
         };
         tblResults.setModel(tblModel);
-    }
-    
-    public void fillCbxType(JComboBox cbx){
-        cbx.removeAllItems();
-        ArrayList<FoodType> foodTypes = foodTypeBO.list();
-        cbx.addItem(new FoodType(0, "Todos", null));
-        for (FoodType foodType : foodTypes) {
-            cbx.addItem(foodType);
-        }
-    }
-    
-    public void fillCbxSearchBy(JComboBox cbx){
-        cbx.removeAllItems();
-        cbx.addItem("Descripcion");
-        for (HashMap<String, String> nutrient : nutrients) {
-            cbx.addItem(nutrient.get("label"));
-        }
+        tblResults.getColumnModel().getColumn(0).setMinWidth(300);
+        tblResults.getTableHeader().setReorderingAllowed(false);
     }
 
     /**
@@ -136,6 +143,8 @@ public class SearchFood extends javax.swing.JDialog {
         btnSearch = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setModal(true);
+        setPreferredSize(new java.awt.Dimension(1000, 500));
 
         tblResults.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -157,6 +166,17 @@ public class SearchFood extends javax.swing.JDialog {
 
         jLabel2.setText("Buscar en");
 
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchKeyPressed(evt);
+            }
+        });
+
         cbxSearchBy.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         cbxFoodType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -174,29 +194,27 @@ public class SearchFood extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbxFoodType, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(cbxSearchBy, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addComponent(btnSearch)))
+                                .addComponent(txtSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSearch))))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -208,7 +226,7 @@ public class SearchFood extends javax.swing.JDialog {
                         .addComponent(cbxSearchBy, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -228,6 +246,17 @@ public class SearchFood extends javax.swing.JDialog {
         
         search();
     }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            search();
+        }
+    }//GEN-LAST:event_txtSearchKeyPressed
+
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchActionPerformed
 
     /**
      * @param args the command line arguments

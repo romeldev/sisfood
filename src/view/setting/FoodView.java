@@ -17,16 +17,12 @@ import entity.Food;
 import entity.FoodType;
 import entity.Nutrient;
 import entity.UnitType;
-import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Robot;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -106,6 +102,7 @@ public class FoodView extends javax.swing.JFrame {
         tblFoods.setRowHeight(30);
         tblFoods.getColumnModel().getColumn(0).setMaxWidth(50);
         tblFoods.getColumnModel().getColumn(2).setMaxWidth(30);
+        tblFoods.getTableHeader().setReorderingAllowed(false);
     }
     //OK
     public void initTblUnits(){
@@ -115,7 +112,7 @@ public class FoodView extends javax.swing.JFrame {
         DefaultTableModel tblMdlUnits = new DefaultTableModel(null, headers) {
             @Override
             public boolean isCellEditable(int row, int column) {
-               return column>0;
+               return false;
             }
         };
         tblUnits.setModel(tblMdlUnits);
@@ -128,6 +125,7 @@ public class FoodView extends javax.swing.JFrame {
                 unit.getDescrip(), "", CERO_DECIMAL
             });
         }
+        tblUnits.getTableHeader().setReorderingAllowed(false);
     }
     //OK
     public void initTblNutrients(){
@@ -154,6 +152,7 @@ public class FoodView extends javax.swing.JFrame {
                 nutrient.get(column), CERO_DECIMAL
             });
         }
+        tblNutrients.getTableHeader().setReorderingAllowed(false);
     }
     //OK
     public void searchFood() {
@@ -372,8 +371,8 @@ public class FoodView extends javax.swing.JFrame {
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtGrams, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Food"));
@@ -520,8 +519,8 @@ public class FoodView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGap(22, 22, 22))
         );
 
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/btn_delete.png"))); // NOI18N
@@ -582,7 +581,9 @@ public class FoodView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlInsumos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pnlInsumos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(1, 1, 1))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -593,8 +594,9 @@ public class FoodView extends javax.swing.JFrame {
                             .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(pnlNutrients, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pnlNutrients, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(11, 11, 11))))
         );
 
         pack();

@@ -5,6 +5,8 @@
  */
 package entity;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author HP_RYZEN
@@ -13,11 +15,13 @@ public class Preparation {
     
     private int id;
     
-    private String descrip;
+    private String descrip="";
     
     private PreparationType preparationType;
     
     private Company company;
+    
+    private ArrayList<PreparationDetail> preparationDetails;
 
     public Preparation() {
     }
@@ -65,6 +69,15 @@ public class Preparation {
     public void setCompany(Company company) {
         this.company = company;
     }
+
+    public ArrayList<PreparationDetail> getPreparationDetails() {
+        return preparationDetails;
+    }
+
+    public void setPreparationDetails(ArrayList<PreparationDetail> preparationDetails) {
+        this.preparationDetails = preparationDetails;
+    }
+    
 
     @Override
     public String toString() {

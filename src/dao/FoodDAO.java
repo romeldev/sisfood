@@ -8,12 +8,14 @@ package dao;
 import entity.Company;
 import entity.Food;
 import entity.FoodType;
+import entity.Nutrient;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,11 +26,11 @@ public class FoodDAO implements CRUD_FULL<Food>{
     public static void main(String[] args) {
         Connection conn = Conexion.getConnection();
         FoodDAO dao = new FoodDAO();
-        Food item = new Food(22, "romel editado", new FoodType(2));
-        System.out.println(dao.delete(conn, item.getId()));
-        System.out.println(item);
+        System.out.println(dao.searchWithNutrients(conn, "descrip", "", 0 ));
     }
     private String table = "foods";
+    
+    private String[] nutrientColumns = Nutrient.Columns();
     
     @Override
     public ArrayList<Food> list(Connection conn) {
@@ -148,6 +150,40 @@ public class FoodDAO implements CRUD_FULL<Food>{
                 item.setId(rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
                 item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                list.add(item);
+            }
+            conn.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+        return list;
+    }
+    
+    public ArrayList<Food> searchWithNutrients(Connection conn, String column, String search, int foodTypeId) {
+        PreparedStatement ps;
+        ResultSet rs;
+        String sql = "select f.descrip, f.food_type_id, n.* from "+table+" as f"
+                + " left join nutrients as n on n.food_id = f.id "
+                + " where "+column+" like '%"+search+"%'";
+        if( foodTypeId>0 ) sql += " and food_type_id="+foodTypeId;
+        
+        ArrayList<Food> list = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            list = new ArrayList<>();
+            while (rs.next()) {
+                Food item = new Food();
+                item.setId(rs.getInt("food_id"));
+                item.setDescrip(rs.getString("descrip"));
+                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                
+                HashMap<String, String> nutrients = new HashMap<>();
+                for (String nutrientColumn : nutrientColumns) {
+                    nutrients.put(nutrientColumn, rs.getString(nutrientColumn));
+                }
+                
+                item.setNutrients(nutrients);
                 list.add(item);
             }
             conn.close();

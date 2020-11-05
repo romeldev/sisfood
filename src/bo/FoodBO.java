@@ -5,20 +5,16 @@
  */
 package bo;
 
-import common.Helper;
 import dao.FoodDAO;
 import dao.Conexion;
 import dao.FactorUnitDAO;
 import dao.NutrientDAO;
-import entity.FactorUnit;
 import entity.Food;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-
 /**
  *
  * @author HP_RYZEN
@@ -46,7 +42,7 @@ public class FoodBO {
     public ArrayList<Food> searchWithNutrients(String column, String search, int foodTypeId)
     {
         Connection conn = Conexion.getConnection();
-        ArrayList<Food> list = foodDAO.search(conn, column, search, foodTypeId);
+        ArrayList<Food> list = foodDAO.searchWithNutrients(conn, column, search, foodTypeId);
         return list;
     }
     

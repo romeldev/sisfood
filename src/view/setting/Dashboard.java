@@ -16,6 +16,9 @@ public class Dashboard extends javax.swing.JFrame {
      */
     public Dashboard() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        
+        lblMenuAlimentos.setVisible(false);
     }
 
     /**
@@ -27,40 +30,58 @@ public class Dashboard extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jScrollBar1 = new javax.swing.JScrollBar();
-        jLabel2 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        lblMenuMantenimiento = new javax.swing.JLabel();
+        lblMenuAlimentos = new javax.swing.JLabel();
+        lblMenuProgramacion = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("jLabel1");
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel2.setText("jLabel1");
+        jPanel2.setBackground(new java.awt.Color(34, 45, 50));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblMenuMantenimiento.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
+        lblMenuMantenimiento.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuMantenimiento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/menu_config.png"))); // NOI18N
+        lblMenuMantenimiento.setText("MANTENIMIENTO");
+        jPanel2.add(lblMenuMantenimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 190, 40));
+
+        lblMenuAlimentos.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
+        lblMenuAlimentos.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuAlimentos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/menu_config.png"))); // NOI18N
+        lblMenuAlimentos.setText("ALIMENTOS");
+        jPanel2.add(lblMenuAlimentos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 190, 40));
+
+        lblMenuProgramacion.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
+        lblMenuProgramacion.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuProgramacion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/menu_config.png"))); // NOI18N
+        lblMenuProgramacion.setText("PROGRAMACION");
+        jPanel2.add(lblMenuProgramacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 190, 40));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 190, 490));
+
+        jPanel3.setBackground(new java.awt.Color(60, 141, 188));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 60));
+
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 60, 630, 490));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(456, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(207, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -102,8 +123,12 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollBar jScrollBar1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JLabel lblMenuAlimentos;
+    private javax.swing.JLabel lblMenuMantenimiento;
+    private javax.swing.JLabel lblMenuProgramacion;
     // End of variables declaration//GEN-END:variables
 }

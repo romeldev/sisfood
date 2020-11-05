@@ -21,18 +21,17 @@ import javax.swing.JOptionPane;
  *
  * @author HP_RYZEN
  */
-public class FactorUnitDAO implements CRUD{
+public class FactorUnitDAO implements CRUD_FULL<FactorUnit>{
 
-    private FactorUnit entity;
     
     private String table = "factor_units";
     
     @Override
-    public ArrayList<Object> list(Connection conn) {
+    public ArrayList<FactorUnit> list(Connection conn) {
         Statement st = null;
         ResultSet rs = null;
         String sql = "select * from "+table;
-        ArrayList<Object> list = null;
+        ArrayList<FactorUnit> list = null;
         
         try {
             list = new ArrayList<>();
@@ -54,8 +53,7 @@ public class FactorUnitDAO implements CRUD{
     }
 
     @Override
-    public Object read(Connection conn, Object object) {
-        int id = (int) object;
+    public FactorUnit read(Connection conn, Integer id) {
         PreparedStatement ps;
         ResultSet rs;
         String sql = "select * from "+table+" where id=?";
@@ -79,8 +77,7 @@ public class FactorUnitDAO implements CRUD{
     }
 
     @Override
-    public boolean create(Connection conn, Object object) {
-        entity = (FactorUnit)object;
+    public boolean create(Connection conn, FactorUnit entity) {
         boolean status = false;
         PreparedStatement ps = null;
         String sql = "insert into "+table+" (food_id, unit_type_id, descrip, factor) ";
@@ -101,8 +98,7 @@ public class FactorUnitDAO implements CRUD{
     }
 
     @Override
-    public boolean update(Connection conn, Object object) {
-        entity = (FactorUnit)object;
+    public boolean update(Connection conn, FactorUnit entity) {
         boolean status = false;
         PreparedStatement ps = null;
         String sql = "update "+table+" set food_id=?,unit_type_id=?,descrip=?,factor=? where id=?";
@@ -123,9 +119,7 @@ public class FactorUnitDAO implements CRUD{
     }
 
     @Override
-    public boolean delete(Connection conn, Object object) {
-        int id = (object instanceof Integer)? (Integer)object: ((FactorUnit)object).getId();
-
+    public boolean delete(Connection conn, Integer id) {
         boolean status = false;
         PreparedStatement ps = null;
         String sql = "delete from "+table+" where id=?";
@@ -141,11 +135,13 @@ public class FactorUnitDAO implements CRUD{
         return status;
     }
     
-    public ArrayList<Object> listByFoodId(Connection conn, int foodId) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String sql = "select * from "+table +" where food_id=?";
-        ArrayList<Object> list = null;
+    public ArrayList<FactorUnit> listByFoodId(Connection conn, int foodId) {
+        PreparedStatement ps;
+        ResultSet rs;
+        String sql = "select fu.*, ut.descrip unit_type_descrip from "+table+" as fu";
+        sql += " left join unit_types as ut on ut.id = fu.unit_type_id";
+        sql += " where fu.food_id=?";
+        ArrayList<FactorUnit> list = null;
         
         try {
             list = new ArrayList<>();
@@ -158,7 +154,7 @@ public class FactorUnitDAO implements CRUD{
                 item.setDescrip(rs.getString("descrip"));
                 item.setFactor(rs.getDouble("factor"));
                 item.setFood( new Food( rs.getInt("food_id")));
-                item.setUnitType( new UnitType(rs.getInt("unit_type_id"), null));
+                item.setUnitType( new UnitType(rs.getInt("unit_type_id"), rs.getString("unit_type_descrip")));
                 list.add(item);
             }
         } catch (SQLException ex) {
@@ -230,20 +226,5 @@ public class FactorUnitDAO implements CRUD{
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
         return status;
-    }
-    
-    public static void main(String[] args) {
-        Connection conn = Conexion.getConnection();
-        ArrayList<FactorUnit> list = new ArrayList<>();
-        FactorUnit item1 = new FactorUnit(0, new Food(1), new UnitType(1), "EN GRAMOS EDIT", 1.00);
-        FactorUnit item2 = new FactorUnit(0, new Food(1), new UnitType(2), "EN KILOS EDIT", 1000.00);
-        FactorUnit item3 = new FactorUnit(0, new Food(1), new UnitType(3), "EN QUINTAL EDIT", 50000.00);
-        
-        list.add(item1);
-        list.add(item2);
-        list.add(item3);
-        
-        FactorUnitDAO dao = new FactorUnitDAO();
-        System.out.println( dao.updateMultiple(conn, list) );
     }
 }

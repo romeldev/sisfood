@@ -5,119 +5,64 @@
  */
 package bo;
 
-import common.Helper;
-import dao.FoodDAO;
 import dao.Conexion;
 import dao.FactorUnitDAO;
-import dao.NutrientDAO;
+import dao.PreparationDAO;
+import dao.PreparationDetailDAO;
 import entity.FactorUnit;
-import entity.Food;
+import entity.Preparation;
+import entity.PreparationDetail;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author HP_RYZEN
  */
-public class FoodBO {
+public class PreparationBO {
     
-    private FoodDAO foodDAO = new FoodDAO();
+    private PreparationDAO preparationDAO = new PreparationDAO();
+    private PreparationDetailDAO preparationDetailDAO = new PreparationDetailDAO();
     private FactorUnitDAO factorUnitDAO = new FactorUnitDAO();
-    private NutrientDAO nutrientDAO = new NutrientDAO();
     
-    public ArrayList<Food> list()
+    public ArrayList<Preparation> list()
     {
         Connection conn = Conexion.getConnection();
-        ArrayList<Food> list = foodDAO.list(conn);
+        ArrayList<Preparation> list = preparationDAO.list(conn);
         return list;
     }
     
-    public ArrayList<Food> search(String column, String search, int foodTypeId)
+    public ArrayList<Preparation> search(int companyId, int preparationTypeId, String search)
     {
         Connection conn = Conexion.getConnection();
-        ArrayList<Food> list = foodDAO.search(conn, column, search, foodTypeId);
+        ArrayList<Preparation> list = preparationDAO.search(conn, companyId, preparationTypeId, search);
         return list;
     }
     
-    public ArrayList<Food> searchWithNutrients(String column, String search, int foodTypeId)
+    public boolean update( Preparation item){
+        Connection conn = Conexion.getConnection();
+        return preparationDAO.update(conn, item);
+    }
+    
+    public boolean create( Preparation item ) {
+        Connection conn = Conexion.getConnection();
+        return preparationDAO.create(conn, item);
+    }
+    
+    public ArrayList<PreparationDetail> getPreparationDetails(int preparationId)
     {
         Connection conn = Conexion.getConnection();
-        ArrayList<Food> list = foodDAO.search(conn, column, search, foodTypeId);
-        return list;
-    }
-    
-    public boolean update( Food item){
-        Connection conn = Conexion.getConnection();
-        return foodDAO.update(conn, item);
-    }
-    
-    public boolean create( Food item ) {
-        Connection conn = Conexion.getConnection();
-        return foodDAO.create(conn, item);
-    }
-    
-    public boolean delete( Food item ) {
-        Connection conn = Conexion.getConnection(false);
-        boolean status = false;
-        try {
-            if(  factorUnitDAO.deleteByFoodId(conn, item.getId()) ){
-                if( nutrientDAO.deleteByFoodId(conn, item.getId()) ){
-                    if( foodDAO.delete(conn, item.getId()) ){
-                        conn.commit();
-                        status = true;
-                    }else{ conn.rollback();}
-                }else { conn.rollback(); }
-            }else{ conn.rollback(); }
-            
-        } catch (SQLException ex) {
-            try {
-                conn.rollback();
-            } catch (SQLException ex1) {
-                Logger.getLogger(FoodBO.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+        ArrayList<PreparationDetail> list = preparationDetailDAO.listDetailOfPreparation(conn, preparationId);
+        
+        //por cada elemento objeter sus unidades
+        for (PreparationDetail preparationDetail : list) {
+            ArrayList<FactorUnit> factorUnits = new ArrayList<>();
+            factorUnits = factorUnitDAO.listByFoodId(Conexion.getConnection(), preparationDetail.getFood().getId());
+            preparationDetail.getFood().setFactorUnits(factorUnits);
         }
-        return status;
-    }
-    
-
-    
-    public boolean save(Food food)
-    {
-        Connection conn = Conexion.getConnection(false);
-        boolean status = false;
-        try {
-            if( food.getId()== 0){
-                if( foodDAO.create(conn, food)){
-                    food.getFactorUnits().forEach((factorUnit) -> factorUnit.setFood(food));
-                    if( factorUnitDAO.createMultiple(conn, food.getFactorUnits())){
-                        food.getNutrients().put("food_id", food.getId()+"");
-                        if( nutrientDAO.create(conn, food.getNutrients()) ){
-                            conn.commit();
-                            status = true;
-                        }else{ conn.rollback(); }
-                    }else{ conn.rollback(); }
-                }else{ conn.rollback(); }
-            }else{
-                if( foodDAO.update(conn, food) ){
-                    if( factorUnitDAO.updateMultiple(conn, food.getFactorUnits()) ){
-                        if( nutrientDAO.updateByFoodId(conn, food.getNutrients()) ){
-                            conn.commit();
-                            status = true;
-                        }else { conn.rollback(); }
-                    }else{ conn.rollback(); }
-                }else{ conn.rollback(); }
-            }
-        } catch (SQLException ex) {
-            try {
-                conn.rollback();
-            } catch (SQLException ex1) {
-                Logger.getLogger(FoodBO.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        }
-        return status;
+        return list;
     }
 }

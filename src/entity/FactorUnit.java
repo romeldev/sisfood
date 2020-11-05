@@ -12,23 +12,25 @@ package entity;
 public class FactorUnit {
     
     private int id;
+    private String descrip = "";
+    private Double factor;
     private Food food;
     private UnitType unitType;
-    private String descrip;
-    private Double factor;
 
     public FactorUnit() {
     }
 
-    public FactorUnit(int id, Food food, UnitType unitType, String descrip, Double factor) {
+    public FactorUnit(int id) {
         this.id = id;
-        this.food = food;
-        this.unitType = unitType;
+    }
+
+    public FactorUnit(int id, String descrip, Double factor, Food food, UnitType unitType ) {
+        this.id = id;
         this.descrip = descrip;
         this.factor = factor;
+        this.food = food;
+        this.unitType = unitType;
     }
-    
-    
 
     public int getId() {
         return id;
@@ -72,6 +74,6 @@ public class FactorUnit {
 
     @Override
     public String toString() {
-        return "FactorUnit{" + "id=" + id + ", food=" + food.getDescrip() + ", unitType=" + unitType.getDescrip() + ", descrip=" + descrip + ", factor=" + factor + '}';
+        return "FactorUnit{" + "id=" + id + ", descrip=" + this.getDescrip() +"}";
     }
 }

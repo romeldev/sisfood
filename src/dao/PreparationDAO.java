@@ -25,15 +25,7 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
     public static void main(String[] args) {
         Connection conn = new Conexion().getConnection();
         PreparationDAO dao = new PreparationDAO();
-        
-        Preparation item = new Preparation();
-        item.setId(31);
-        item.setDescrip("romel editado");
-        item.setCompany(new Company(1));
-        item.setPreparationType(new PreparationType(1));
-        
-        System.out.println(dao.delete(conn, item.getId()));
-        System.out.println(item);
+        System.out.println(dao.search(conn, 2, 0, "quo").size());
     }
     
     
@@ -143,5 +135,39 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
         return status;
+    }
+    
+    
+    public ArrayList<Preparation> search(Connection conn, Integer companyId, Integer preparationTypeId, String search) {
+        PreparedStatement ps;
+        ResultSet rs;
+        String sql = "select * from "+table;
+        sql += " where company_id=?";
+        sql += " and preparation_type_id=?";
+        sql += " and descrip like ?";
+        
+        ArrayList<Preparation> list = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, companyId);
+            ps.setInt(2, preparationTypeId);
+            ps.setString(3, "%"+search+"%");
+            rs = ps.executeQuery();
+            list = new ArrayList<>();
+            while (rs.next()) {
+                Preparation item = new Preparation();
+                item.setId(rs.getInt("id"));
+                item.setDescrip(rs.getString("descrip"));
+                item.setPreparationType(new PreparationType(rs.getInt("preparation_type_id")));
+                
+                Company company = new Company(rs.getInt("preparation_type_id"));
+                item.setCompany( company   );
+                list.add(item);
+            }
+            conn.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+        return list;
     }
 }

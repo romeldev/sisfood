@@ -6,7 +6,7 @@
 package view.assets;
 
 import common.Helper;
-import entity.Food;
+import entity.Preparation;
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -20,9 +20,9 @@ import javax.swing.table.AbstractTableModel;
 public class PreparationTM extends AbstractTableModel {
 
     private String[] columnNames = { "ID", "DESCRIPCION" , "M" };
-    private ArrayList<Food> data = new ArrayList<>();
+    private ArrayList<Preparation> data = new ArrayList<>();
 
-    public void setData(ArrayList<Food> data) {
+    public void setData(ArrayList<Preparation> data) {
         this.data = data;
     }
     

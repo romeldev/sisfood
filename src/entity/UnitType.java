@@ -13,7 +13,7 @@ public class UnitType {
     
     private int id;
     
-    private String descrip;
+    private String descrip = "";
 
     public UnitType() {
     }

@@ -7,6 +7,7 @@ package view.assets;
 
 import java.awt.Component;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -22,8 +23,19 @@ public class TableRender extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if( value instanceof JButton){
-            JButton btn = (JButton) value;
-            btn.setOpaque(false);
+            JButton component = (JButton) value;
+            component.setOpaque(false);
+            return component;
+        }
+        
+        if( value instanceof JComboBox){
+            JComboBox component = (JComboBox) value;
+            return component;
+        }
+        
+        
+        if( value instanceof Component){
+            Component btn = (Component) value;
             return btn;
         }
         

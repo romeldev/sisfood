@@ -5,20 +5,162 @@
  */
 package view.setting;
 
+import bo.CompanyBO;
+import bo.PreparationBO;
+import bo.PreparationTypeBO;
+import entity.Company;
+import entity.FactorUnit;
+import entity.Preparation;
+import entity.PreparationDetail;
+import entity.PreparationType;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.EventObject;
+import javax.swing.CellEditor;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.event.CellEditorListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import view.assets.PreparationDetailTM;
+import view.assets.PreparationTM;
+import view.assets.TableEditor;
+import view.assets.TableRender;
+
 /**
  *
  * @author HP_RYZEN
  */
-public class Preparation extends javax.swing.JFrame {
+public class PreparationView extends javax.swing.JFrame {
 
     /**
      * Creates new form Preparation
      */
-    public Preparation() {
+    PreparationBO preparationBO = new PreparationBO();
+    CompanyBO companyBO = new CompanyBO();
+    PreparationTypeBO preparationTypeBO = new PreparationTypeBO();
+    ArrayList<Preparation> preparations = new ArrayList<>();
+    ArrayList<PreparationType> preparationTypes = new ArrayList<>();
+    ArrayList<Company> companies = new ArrayList<>();
+    Preparation preparation = new Preparation();
+    
+    PreparationTM preparationTM = new PreparationTM();
+    PreparationDetailTM preparationDetailTM = new PreparationDetailTM();
+    
+    public PreparationView() {
         initComponents();
         this.setLocationRelativeTo(null);
+        txtId.setEnabled(false);
         
+        clearForm();
+        initCbxCompany(cbxCompany);
+        initCbxPreparationType(cbxPreparationType);
+        initTablePreparation();
+        initTablePreparationDetail();
+        searchPreparation();
     }
+    
+    private void initCbxCompany(JComboBox cbx){
+        cbx.removeAllItems();
+        companies = companyBO.list();
+        companies.add(0, new Company(0, "Seleccione"));
+        for (Company company : companies) {
+            cbx.addItem(company);
+        }
+        if( companies.size() > 1) cbx.setSelectedIndex(1);
+
+        cbx.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    searchPreparation();
+                }
+            }
+        });
+    }
+    
+    private void initCbxPreparationType(JComboBox cbx){
+        cbx.removeAllItems();
+        preparationTypes = preparationTypeBO.list();
+        preparationTypes.add(0, new PreparationType(0, "Seleccione"));
+        for (PreparationType preparationType : preparationTypes) {
+            cbx.addItem(preparationType);
+        }
+        
+        if( preparationTypes.size() > 1) cbx.setSelectedIndex(1);
+        cbx.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    searchPreparation();
+                }
+            }
+        });
+    }
+    
+    private void initTablePreparation()
+    {
+        tblPreparations.setDefaultRenderer(Object.class, new TableRender());
+        tblPreparations.setModel(preparationTM);
+        tblPreparations.setRowHeight(30);
+        tblPreparations.getColumnModel().getColumn(0).setMaxWidth(50);
+        tblPreparations.getColumnModel().getColumn(2).setMaxWidth(30);
+    }
+    
+    private void initTablePreparationDetail()
+    {
+        tblPreparationDetail.setDefaultRenderer(Object.class, new TableRender());
+        tblPreparationDetail.setDefaultEditor(Object.class, new TableEditor());
+        tblPreparationDetail.setModel(preparationDetailTM);
+        tblPreparationDetail.setRowHeight(30);
+        tblPreparationDetail.getColumnModel().getColumn(3).setMaxWidth(50);
+        tblPreparationDetail.getColumnModel().getColumn(4).setMaxWidth(30);
+    }
+    
+    private void searchPreparation()
+    {
+        int companyId = ((Company) cbxCompany.getSelectedItem()).getId();
+
+
+        int preparationTypeId = ((PreparationType) cbxPreparationType.getSelectedItem()).getId();
+
+        preparations = preparationBO.search( companyId, preparationTypeId ,txtSearchPreparation.getText());
+
+        preparationTM.setData(preparations);
+        preparationTM.fireTableDataChanged();
+    }
+    
+    
+    private void clearForm()
+    {
+        preparation = new Preparation();
+    }
+    
+    private void editForm()
+    {
+        preparation.setPreparationDetails(preparationBO.getPreparationDetails(preparation.getId()));
+        txtId.setText(preparation.getId()+"");
+        txtDescrip.setText(preparation.getDescrip());
+        
+        for (int i = 0; i < preparationTypes.size(); i++) {
+            if( preparation.getPreparationType().getId() == preparationTypes.get(i).getId()){
+                cbxPreparationType.setSelectedIndex(i);
+                break;
+            }
+        }
+        preparationDetailTM.setData(preparation.getPreparationDetails());
+        preparationDetailTM.fireTableDataChanged();
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -31,23 +173,28 @@ public class Preparation extends javax.swing.JFrame {
 
         pnlPreparaciones = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblPreparaciones = new javax.swing.JTable();
-        txtDescrip = new javax.swing.JTextField();
+        tblPreparations = new javax.swing.JTable();
+        txtSearchPreparation = new javax.swing.JTextField();
         pnlPreparacion = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblAlimentos = new javax.swing.JTable();
-        txtDescrip1 = new javax.swing.JTextField();
+        tblPreparationDetail = new javax.swing.JTable();
+        txtDescrip = new javax.swing.JTextField();
         btnCancel = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         btnCancel1 = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
+        txtId = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        cbxCompany = new javax.swing.JComboBox<>();
+        jLabel3 = new javax.swing.JLabel();
+        cbxPreparationType = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         pnlPreparaciones.setBorder(javax.swing.BorderFactory.createTitledBorder("Lista de preparaciones"));
 
-        tblPreparaciones.setModel(new javax.swing.table.DefaultTableModel(
+        tblPreparations.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -55,11 +202,29 @@ public class Preparation extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane1.setViewportView(tblPreparaciones);
+        tblPreparations.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                tblPreparationsMouseMoved(evt);
+            }
+        });
+        tblPreparations.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPreparationsMouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                tblPreparationsMouseExited(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblPreparations);
 
-        txtDescrip.addActionListener(new java.awt.event.ActionListener() {
+        txtSearchPreparation.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtDescripActionPerformed(evt);
+                txtSearchPreparationActionPerformed(evt);
+            }
+        });
+        txtSearchPreparation.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchPreparationKeyPressed(evt);
             }
         });
 
@@ -70,17 +235,17 @@ public class Preparation extends javax.swing.JFrame {
             .addGroup(pnlPreparacionesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlPreparacionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(txtDescrip, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                    .addComponent(txtSearchPreparation, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE))
                 .addContainerGap())
         );
         pnlPreparacionesLayout.setVerticalGroup(
             pnlPreparacionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPreparacionesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(txtDescrip, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(txtSearchPreparation, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -88,7 +253,7 @@ public class Preparation extends javax.swing.JFrame {
 
         jLabel2.setText("Descripcion*");
 
-        tblAlimentos.setModel(new javax.swing.table.DefaultTableModel(
+        tblPreparationDetail.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -96,11 +261,24 @@ public class Preparation extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane2.setViewportView(tblAlimentos);
+        tblPreparationDetail.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                tblPreparationDetailMouseMoved(evt);
+            }
+        });
+        tblPreparationDetail.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPreparationDetailMouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                tblPreparationDetailMouseExited(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tblPreparationDetail);
 
-        txtDescrip1.addActionListener(new java.awt.event.ActionListener() {
+        txtDescrip.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtDescrip1ActionPerformed(evt);
+                txtDescripActionPerformed(evt);
             }
         });
 
@@ -143,82 +321,115 @@ public class Preparation extends javax.swing.JFrame {
             .addGroup(pnlPreparacionLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPreparacionLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 333, Short.MAX_VALUE)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSave))
+                    .addComponent(txtDescrip, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
                     .addGroup(pnlPreparacionLayout.createSequentialGroup()
                         .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnCancel))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(btnCancel)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
-            .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnlPreparacionLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(txtDescrip1, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-                    .addContainerGap()))
         );
         pnlPreparacionLayout.setVerticalGroup(
             pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlPreparacionLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(56, 56, 56)
+                .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtId, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDescrip, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnCancel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
-            .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnlPreparacionLayout.createSequentialGroup()
-                    .addGap(57, 57, 57)
-                    .addComponent(txtDescrip1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(286, Short.MAX_VALUE)))
         );
+
+        jLabel4.setText("EMPRESA");
+
+        cbxCompany.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbxCompanyItemStateChanged(evt);
+            }
+        });
+
+        jLabel3.setText("CATEGORIA");
+
+        cbxPreparationType.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbxPreparationTypeItemStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlPreparacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(pnlPreparacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbxPreparationType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cbxCompany, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addGap(18, 18, 18)
                 .addComponent(pnlPreparaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(pnlPreparacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbxCompany, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbxPreparationType, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(pnlPreparacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(pnlPreparaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void txtSearchPreparationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchPreparationActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchPreparationActionPerformed
+
     private void txtDescripActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescripActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDescripActionPerformed
 
-    private void txtDescrip1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescrip1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDescrip1ActionPerformed
-
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         // TODO add your handling code here:
+        SearchFood searcher = new SearchFood(this, false);
+        searcher.setVisible(true);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -231,6 +442,80 @@ public class Preparation extends javax.swing.JFrame {
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         
     }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void txtSearchPreparationKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchPreparationKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            searchPreparation();
+        }
+    }//GEN-LAST:event_txtSearchPreparationKeyPressed
+
+    private void tblPreparationsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreparationsMouseClicked
+        // TODO add your handling code here:
+        int col = tblPreparations.columnAtPoint(evt.getPoint());
+        int row = tblPreparations.rowAtPoint(evt.getPoint());
+
+        if( row < tblPreparations.getRowCount() && row >-1 && col < tblPreparations.getColumnCount() && col > -1 ){
+            Object value = tblPreparations.getValueAt(row, col);
+            if ( value instanceof JButton){
+                JButton btn = (JButton) value;
+                preparation = preparations.get(row);
+                
+                if(btn.getName().equals("EDIT")){
+                    editForm();
+                }
+            }
+        }
+    }//GEN-LAST:event_tblPreparationsMouseClicked
+
+    private void cbxCompanyItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxCompanyItemStateChanged
+
+    }//GEN-LAST:event_cbxCompanyItemStateChanged
+
+    private void cbxPreparationTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxPreparationTypeItemStateChanged
+
+    }//GEN-LAST:event_cbxPreparationTypeItemStateChanged
+
+    private void tblPreparationDetailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreparationDetailMouseClicked
+        int col = tblPreparationDetail.columnAtPoint(evt.getPoint());
+        int row = tblPreparationDetail.rowAtPoint(evt.getPoint());
+
+        if( row < tblPreparationDetail.getRowCount() && row >-1 && col < tblPreparationDetail.getColumnCount() && col > -1 ){
+            Object value = tblPreparationDetail.getValueAt(row, col);
+            if ( value instanceof JButton){
+                JButton btn = (JButton) value;
+                if(btn.getName().equals("DELETE")){
+                    preparation.getPreparationDetails().remove(row);
+                    
+                    preparationDetailTM.setData(preparation.getPreparationDetails());
+                    preparationDetailTM.fireTableDataChanged();
+                }
+            }
+        }
+    }//GEN-LAST:event_tblPreparationDetailMouseClicked
+
+    private void tblPreparationsMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreparationsMouseMoved
+        if( tblPreparations.columnAtPoint(evt.getPoint()) > 1){
+            this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }else{
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+    }//GEN-LAST:event_tblPreparationsMouseMoved
+
+    private void tblPreparationsMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreparationsMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }//GEN-LAST:event_tblPreparationsMouseExited
+
+    private void tblPreparationDetailMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreparationDetailMouseMoved
+        if( tblPreparationDetail.columnAtPoint(evt.getPoint()) > 3){
+            this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }else{
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+    }//GEN-LAST:event_tblPreparationDetailMouseMoved
+
+    private void tblPreparationDetailMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreparationDetailMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }//GEN-LAST:event_tblPreparationDetailMouseExited
 
     /**
      * @param args the command line arguments
@@ -249,20 +534,21 @@ public class Preparation extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Preparation.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PreparationView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Preparation.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PreparationView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Preparation.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PreparationView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Preparation.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PreparationView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Preparation().setVisible(true);
+                new PreparationView().setVisible(true);
             }
         });
     }
@@ -272,14 +558,19 @@ public class Preparation extends javax.swing.JFrame {
     private javax.swing.JButton btnCancel1;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnSave;
+    private javax.swing.JComboBox<String> cbxCompany;
+    private javax.swing.JComboBox<String> cbxPreparationType;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel pnlPreparacion;
     private javax.swing.JPanel pnlPreparaciones;
-    private javax.swing.JTable tblAlimentos;
-    private javax.swing.JTable tblPreparaciones;
+    private javax.swing.JTable tblPreparationDetail;
+    private javax.swing.JTable tblPreparations;
     private javax.swing.JTextField txtDescrip;
-    private javax.swing.JTextField txtDescrip1;
+    private javax.swing.JTextField txtId;
+    private javax.swing.JTextField txtSearchPreparation;
     // End of variables declaration//GEN-END:variables
 }

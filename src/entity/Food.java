@@ -22,6 +22,13 @@ public class Food {
 
     public Food() {
     }
+
+    public Food(int id, String descrip) {
+        this.id = id;
+        this.descrip = descrip;
+    }
+    
+    
     
     public Food(int id, String descrip, FoodType foodType) {
         this.id = id;

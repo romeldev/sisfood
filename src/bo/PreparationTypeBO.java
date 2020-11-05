@@ -33,18 +33,18 @@ public class PreparationTypeBO {
         return list;
     }
     
-    public boolean update( Object item){
+    public boolean update( PreparationType item){
         Connection conn = Conexion.getConnection();
         return preparationTypeDAO.update(conn, item);
     }
     
-    public boolean create( Object item ) {
+    public boolean create( PreparationType item ) {
         Connection conn = Conexion.getConnection();
         return preparationTypeDAO.create(conn, item);
     }
     
-    public boolean delete( Object item ) {
+    public boolean delete( PreparationType item ) {
         Connection conn = Conexion.getConnection();
-        return preparationTypeDAO.delete(conn, item);
+        return preparationTypeDAO.delete(conn, item.getId());
     }
 }
