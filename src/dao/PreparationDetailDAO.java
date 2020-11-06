@@ -200,10 +200,12 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
         ResultSet rs;
         String sql = "select pd.*,";
         sql += " f.descrip as food_descrip, f.food_type_id, ";
-        sql += " fu.descrip as fu_descrip, fu.factor as fu_factor, fu.food_id as fu_food_id, fu.unit_type_id as fu_unit_type_id";
+        sql += " fu.descrip as fu_descrip, fu.factor as fu_factor, fu.food_id as fu_food_id, fu.unit_type_id as fu_unit_type_id,";
+        sql += " ut.descrip as ut_unit_type_descrip";
         sql += " from preparation_details as pd";
         sql += " left join foods as f on f.id = pd.food_id";
         sql += " left join factor_units as fu on fu.id = pd.factor_unit_id";
+        sql += " left join unit_types as ut on ut.id = fu.unit_type_id";
         sql += " where pd.preparation_id = ?";
         
         System.out.println(sql);
@@ -225,7 +227,7 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
                         rs.getString("fu_descrip"),
                         rs.getDouble("fu_factor"),
                         new Food(rs.getInt("fu_food_id")),
-                        new UnitType(rs.getInt("fu_unit_type_id"))
+                        new UnitType(rs.getInt("fu_unit_type_id"), rs.getString("ut_unit_type_descrip") )
                 ));
                 list.add(item);
             }

@@ -58,11 +58,11 @@ public class PreparationBO {
         ArrayList<PreparationDetail> list = preparationDetailDAO.listDetailOfPreparation(conn, preparationId);
         
         //por cada elemento objeter sus unidades
-        for (PreparationDetail preparationDetail : list) {
-            ArrayList<FactorUnit> factorUnits = new ArrayList<>();
-            factorUnits = factorUnitDAO.listByFoodId(Conexion.getConnection(), preparationDetail.getFood().getId());
-            preparationDetail.getFood().setFactorUnits(factorUnits);
-        }
+//        for (PreparationDetail preparationDetail : list) {
+//            ArrayList<FactorUnit> factorUnits = new ArrayList<>();
+//            factorUnits = factorUnitDAO.listByFoodId(Conexion.getConnection(), preparationDetail.getFood().getId());
+//            preparationDetail.getFood().setFactorUnits(factorUnits);
+//        }
         return list;
     }
 }

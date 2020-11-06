@@ -45,7 +45,7 @@ public class TableComboBoxByRow extends JPanel
         JTable table = new JTable(model)
         {
             //  Determine editor to be used by row
-            public TableCellEditor getCellEditor(int row, int column)
+                public TableCellEditor getCellEditor(int row, int column)
             {
                 int modelColumn = convertColumnIndexToModel( column );
  

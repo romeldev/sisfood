@@ -7,6 +7,7 @@ package view.assets;
 
 import entity.FactorUnit;
 import entity.PreparationDetail;
+import entity.UnitType;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -39,8 +40,10 @@ public class TableEditor implements TableCellEditor {
             PreparationDetail preparationDetail = preparationDetailTM.getData().get(row);
             
             ArrayList<FactorUnit> factorUnits =  preparationDetail.getFood().getFactorUnits();
+            
+            cbx.addItem(new UnitType(0, "Seleccione"));
             for (int i = 0; i < factorUnits.size(); i++) {
-                cbx.addItem(factorUnits.get(i).getUnitType().getDescrip());
+                cbx.addItem(factorUnits.get(i).getUnitType());
             }
             
             cbx.addItemListener(new ItemListener() {
@@ -54,6 +57,13 @@ public class TableEditor implements TableCellEditor {
                     }
                 }
             });
+            
+            cbx.setSelectedItem(preparationDetail.getFactorUnit());
+            
+            System.out.println(preparationDetail.getFactorUnit());
+            
+            
+            
                 
             return cbx;
         }

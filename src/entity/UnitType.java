@@ -47,6 +47,6 @@ public class UnitType {
 
     @Override
     public String toString() {
-        return "UnitType{" + "id=" + id + ", descrip=" + descrip + '}';
+        return this.descrip;
     }
 }

@@ -159,6 +159,39 @@ public class FoodDAO implements CRUD_FULL<Food>{
         return list;
     }
     
+    
+    public ArrayList<Food> listWithNutrients(Connection conn) {
+        PreparedStatement ps;
+        ResultSet rs;
+        String sql = "select f.descrip, f.food_type_id, n.* from "+table+" as f"
+                + " left join nutrients as n on n.food_id = f.id ";
+        
+        ArrayList<Food> list = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            list = new ArrayList<>();
+            while (rs.next()) {
+                Food item = new Food();
+                item.setId(rs.getInt("food_id"));
+                item.setDescrip(rs.getString("descrip"));
+                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                
+                HashMap<String, String> nutrients = new HashMap<>();
+                for (String nutrientColumn : nutrientColumns) {
+                    nutrients.put(nutrientColumn, rs.getString(nutrientColumn));
+                }
+                
+                item.setNutrients(nutrients);
+                list.add(item);
+            }
+            conn.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+        return list;
+    }
+    
     public ArrayList<Food> searchWithNutrients(Connection conn, String column, String search, int foodTypeId) {
         PreparedStatement ps;
         ResultSet rs;

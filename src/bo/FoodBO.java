@@ -46,6 +46,13 @@ public class FoodBO {
         return list;
     }
     
+    public ArrayList<Food> listWithNutrients()
+    {
+        Connection conn = Conexion.getConnection();
+        ArrayList<Food> list = foodDAO.listWithNutrients(conn);
+        return list;
+    }
+    
     public boolean update( Food item){
         Connection conn = Conexion.getConnection();
         return foodDAO.update(conn, item);

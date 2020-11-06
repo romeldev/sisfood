@@ -9,30 +9,18 @@ import bo.CompanyBO;
 import bo.PreparationBO;
 import bo.PreparationTypeBO;
 import entity.Company;
-import entity.FactorUnit;
 import entity.Preparation;
 import entity.PreparationDetail;
 import entity.PreparationType;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.EventObject;
-import javax.swing.CellEditor;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.event.CellEditorListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
 import view.assets.PreparationDetailTM;
 import view.assets.PreparationTM;
-import view.assets.TableEditor;
 import view.assets.TableRender;
 
 /**
@@ -55,6 +43,8 @@ public class PreparationView extends javax.swing.JFrame {
     PreparationTM preparationTM = new PreparationTM();
     PreparationDetailTM preparationDetailTM = new PreparationDetailTM();
     
+    SearchFood searchFood;
+    
     public PreparationView() {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -66,6 +56,9 @@ public class PreparationView extends javax.swing.JFrame {
         initTablePreparation();
         initTablePreparationDetail();
         searchPreparation();
+        
+        searchFood = new SearchFood(this, true);
+        searchFood.setPreparationView(this);
     }
     
     private void initCbxCompany(JComboBox cbx){
@@ -118,22 +111,19 @@ public class PreparationView extends javax.swing.JFrame {
     private void initTablePreparationDetail()
     {
         tblPreparationDetail.setDefaultRenderer(Object.class, new TableRender());
-        tblPreparationDetail.setDefaultEditor(Object.class, new TableEditor());
         tblPreparationDetail.setModel(preparationDetailTM);
         tblPreparationDetail.setRowHeight(30);
         tblPreparationDetail.getColumnModel().getColumn(3).setMaxWidth(50);
         tblPreparationDetail.getColumnModel().getColumn(4).setMaxWidth(30);
+        tblPreparationDetail.getColumnModel().getColumn(5).setMaxWidth(30);
     }
     
     private void searchPreparation()
     {
         int companyId = ((Company) cbxCompany.getSelectedItem()).getId();
-
-
         int preparationTypeId = ((PreparationType) cbxPreparationType.getSelectedItem()).getId();
 
         preparations = preparationBO.search( companyId, preparationTypeId ,txtSearchPreparation.getText());
-
         preparationTM.setData(preparations);
         preparationTM.fireTableDataChanged();
     }
@@ -142,6 +132,12 @@ public class PreparationView extends javax.swing.JFrame {
     private void clearForm()
     {
         preparation = new Preparation();
+        txtId.setText(null);
+        txtDescrip.setText(null);
+        
+        preparationDetailTM.getData().clear();
+        preparationDetailTM.fireTableDataChanged();
+        tblPreparations.getSelectionModel().clearSelection();
     }
     
     private void editForm()
@@ -160,6 +156,12 @@ public class PreparationView extends javax.swing.JFrame {
         preparationDetailTM.fireTableDataChanged();
     }
     
+    public void addPreparationDetail( PreparationDetail item){
+        
+        preparation.getPreparationDetails().add(item);
+        preparationDetailTM.setData(preparation.getPreparationDetails());
+        preparationDetailTM.fireTableDataChanged();
+    }
     
 
     /**
@@ -180,9 +182,9 @@ public class PreparationView extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblPreparationDetail = new javax.swing.JTable();
         txtDescrip = new javax.swing.JTextField();
-        btnCancel = new javax.swing.JButton();
+        btnAddFood = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
-        btnCancel1 = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         txtId = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -245,7 +247,7 @@ public class PreparationView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(txtSearchPreparation, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -282,11 +284,11 @@ public class PreparationView extends javax.swing.JFrame {
             }
         });
 
-        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/btn_add.png"))); // NOI18N
-        btnCancel.setText("ALIMENTO");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+        btnAddFood.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/btn_add.png"))); // NOI18N
+        btnAddFood.setText("ALIMENTO");
+        btnAddFood.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+                btnAddFoodActionPerformed(evt);
             }
         });
 
@@ -298,11 +300,11 @@ public class PreparationView extends javax.swing.JFrame {
             }
         });
 
-        btnCancel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/btn_clear.png"))); // NOI18N
-        btnCancel1.setToolTipText("Limpiar");
-        btnCancel1.addActionListener(new java.awt.event.ActionListener() {
+        btnCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icons/btn_clear.png"))); // NOI18N
+        btnCancel.setToolTipText("Limpiar");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancel1ActionPerformed(evt);
+                btnCancelActionPerformed(evt);
             }
         });
 
@@ -325,14 +327,14 @@ public class PreparationView extends javax.swing.JFrame {
                         .addGap(0, 333, Short.MAX_VALUE)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancel1)
+                        .addComponent(btnCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSave))
                     .addComponent(txtDescrip, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
                     .addGroup(pnlPreparacionLayout.createSequentialGroup()
                         .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnCancel)
+                            .addComponent(btnAddFood)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -348,12 +350,12 @@ public class PreparationView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDescrip, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnAddFood, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(pnlPreparacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnCancel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
@@ -426,18 +428,17 @@ public class PreparationView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDescripActionPerformed
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        // TODO add your handling code here:
-        SearchFood searcher = new SearchFood(this, false);
-        searcher.setVisible(true);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    private void btnAddFoodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFoodActionPerformed
+        searchFood.open(null);
+    }//GEN-LAST:event_btnAddFoodActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnCancel1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancel1ActionPerformed
-    }//GEN-LAST:event_btnCancel1ActionPerformed
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        clearForm();
+    }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         
@@ -463,6 +464,8 @@ public class PreparationView extends javax.swing.JFrame {
                 if(btn.getName().equals("EDIT")){
                     editForm();
                 }
+                
+                
             }
         }
     }//GEN-LAST:event_tblPreparationsMouseClicked
@@ -485,9 +488,13 @@ public class PreparationView extends javax.swing.JFrame {
                 JButton btn = (JButton) value;
                 if(btn.getName().equals("DELETE")){
                     preparation.getPreparationDetails().remove(row);
-                    
                     preparationDetailTM.setData(preparation.getPreparationDetails());
                     preparationDetailTM.fireTableDataChanged();
+                }
+                
+                if(btn.getName().equals("EDIT")){
+                    PreparationDetail pd = preparation.getPreparationDetails().get(row);
+                    searchFood.open(pd);
                 }
             }
         }
@@ -554,8 +561,8 @@ public class PreparationView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddFood;
     private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnCancel1;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cbxCompany;
