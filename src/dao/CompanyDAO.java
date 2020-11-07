@@ -12,7 +12,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.apache.commons.dbutils.DbUtils;
 
 /**
  *
@@ -20,12 +23,22 @@ import javax.swing.JOptionPane;
  */
 public class CompanyDAO implements CRUD_FULL<Company>{
     
+    public static void main(String[] args) {
+        Connection conn = Conexion.getConnection();
+        
+        CompanyDAO dao = new CompanyDAO();
+        
+        for (int i = 0; i < 20; i++) {
+            System.out.println( dao.list(Conexion.getConnection()) );
+        }
+    }
+    
     private String table = "companies";
 
     @Override
     public ArrayList<Company> list(Connection conn) {
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "select * from "+table;
         ArrayList<Company> list = null;
         try {
@@ -38,17 +51,26 @@ public class CompanyDAO implements CRUD_FULL<Company>{
                 item.setDescrip(rs.getString("descrip"));
                 list.add(item);
             }
+            ps.close();
             conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return list;
     }
 
     @Override
     public Company read(Connection conn, Integer id) {
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "select * from "+table+" where id=?";
         Company item = null;
         try {
@@ -63,6 +85,14 @@ public class CompanyDAO implements CRUD_FULL<Company>{
             conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return item;
     }
@@ -70,8 +100,8 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     @Override
     public boolean create(Connection conn, Company entity) {
         boolean status = false;
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "insert into "+table+" (descrip) values (?)";
         try {
             ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -79,10 +109,19 @@ public class CompanyDAO implements CRUD_FULL<Company>{
             int rows  = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if( rs.next()) entity.setId(rs.getInt(1));
-            ps.close();
+            
+            conn.close();
             status = true;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
@@ -91,6 +130,7 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     public boolean update(Connection conn, Company entity) {
         boolean status = false;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "update "+table+" set descrip=? where id=?";
         try {
             ps = conn.prepareStatement(sql);
@@ -101,6 +141,14 @@ public class CompanyDAO implements CRUD_FULL<Company>{
             status = true;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
@@ -109,6 +157,7 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     public boolean delete(Connection conn, Integer id) {
         boolean status = false;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "delete from "+table+" where id=?";
         try {
             ps = conn.prepareStatement(sql);
@@ -118,7 +167,16 @@ public class CompanyDAO implements CRUD_FULL<Company>{
             status = true;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        
         return status;
     }
 }

@@ -6,7 +6,7 @@
 package view.assets;
 
 import common.Helper;
-import entity.Composicion;
+import entity.Composition;
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -20,9 +20,9 @@ import javax.swing.table.AbstractTableModel;
 public class CompositionTM extends AbstractTableModel {
 
     private String[] columnNames = { "ID", "DESCRIPCION", "M", "E" };
-    private ArrayList<Composicion> data;
+    private ArrayList<Composition> data;
 
-    public void setData(ArrayList<Composicion> data) {
+    public void setData(ArrayList<Composition> data) {
         this.data = data;
     }
     

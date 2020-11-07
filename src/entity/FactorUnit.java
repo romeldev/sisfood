@@ -23,6 +23,13 @@ public class FactorUnit {
     public FactorUnit(int id) {
         this.id = id;
     }
+    
+    public FactorUnit(int id, String descrip, Food food, UnitType unitType ) {
+        this.id = id;
+        this.descrip = descrip;
+        this.food = food;
+        this.unitType = unitType;
+    }
 
     public FactorUnit(int id, String descrip, Double factor, Food food, UnitType unitType ) {
         this.id = id;

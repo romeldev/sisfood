@@ -8,7 +8,7 @@ package view.setting;
 import bo.ComposicionBO;
 import common.Helper;
 import common.Validator;
-import entity.Composicion;
+import entity.Composition;
 import java.awt.Cursor;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -26,8 +26,8 @@ public class CompositionView extends javax.swing.JFrame {
      * Creates new form ComposicionView
      */
     ComposicionBO composicionBO = new ComposicionBO();
-    ArrayList<Composicion> list = new ArrayList<>();
-    Composicion item = new Composicion();
+    ArrayList<Composition> list = new ArrayList<>();
+    Composition item = new Composition();
     CompositionTM tblModel = new CompositionTM();
     
     public CompositionView() {
@@ -222,7 +222,7 @@ public class CompositionView extends javax.swing.JFrame {
 
     private void clearForm()
     {
-        item = new Composicion();
+        item = new Composition();
         txtId.setText("");
         txtDescrip.setText("");
         btnSave.setText("GUARDAR");

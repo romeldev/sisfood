@@ -8,7 +8,7 @@ package bo;
 import common.Helper;
 import dao.CompositionDAO;
 import dao.Conexion;
-import entity.Composicion;
+import entity.Composition;
 import java.sql.Connection;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -22,31 +22,26 @@ public class ComposicionBO {
     private CompositionDAO composicionDAO = new CompositionDAO();
     
     
-    public ArrayList<Composicion> list()
+    public ArrayList<Composition> list()
     {
         Connection conn = Conexion.getConnection();
-        ArrayList<Composicion> list = null;
-        try {
-            list = Helper.castList(composicionDAO.list(conn));
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
+        ArrayList<Composition> list = composicionDAO.list(conn);
         return list;
     }
     
-    public boolean update( Object item){
+    public boolean update( Composition item){
         Connection conn = Conexion.getConnection();
         return composicionDAO.update(conn, item);
     }
     
-    public boolean create( Object item ) {
+    public boolean create( Composition item ) {
         Connection conn = Conexion.getConnection();
         return composicionDAO.create(conn, item);
     }
     
-    public boolean delete( Object item ) {
+    public boolean delete( Composition item ) {
         Connection conn = Conexion.getConnection();
-        return composicionDAO.delete(conn, item);
+        return composicionDAO.delete(conn, item.getId());
     }
 
 }

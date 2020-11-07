@@ -9,13 +9,13 @@ package entity;
  *
  * @author HP_RYZEN
  */
-public class Composicion {
+public class Composition {
     
     private int id;
     
     private String descrip;
 
-    public Composicion() {
+    public Composition() {
     }
 
     public int getId() {

@@ -24,9 +24,9 @@ public class Preparation {
     private ArrayList<PreparationDetail> preparationDetails;
 
     public Preparation() {
+        this.preparationDetails = new ArrayList<>();
     }
 
-    
     public Preparation(int id) {
         this.id = id;
     }

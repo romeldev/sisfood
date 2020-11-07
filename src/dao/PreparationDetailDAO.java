@@ -29,7 +29,7 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
         Connection conn = new Conexion().getConnection();
         PreparationDetailDAO dao = new PreparationDetailDAO();
         
-        System.out.println(dao.listDetailOfPreparation(conn, 5).size());
+        System.out.println(dao.listDetailOfPreparation(conn,1));
     }
     
     private final String table = "preparation_details";
@@ -148,7 +148,6 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
         return status;
     }
     
-    
     public boolean createMultiple(Connection conn, ArrayList<PreparationDetail> list) {
         boolean status = false;
         PreparedStatement ps;
@@ -177,7 +176,6 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
         return status;
     }
     
-    
     public boolean deleteByPreparationId(Connection conn, Integer preparationId) {
         boolean status = false;
         PreparedStatement ps;
@@ -194,21 +192,19 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
         return status;
     }
     
-    
     public ArrayList<PreparationDetail> listDetailOfPreparation(Connection conn, Integer preparationId) {
         PreparedStatement ps;
         ResultSet rs;
-        String sql = "select pd.*,";
-        sql += " f.descrip as food_descrip, f.food_type_id, ";
-        sql += " fu.descrip as fu_descrip, fu.factor as fu_factor, fu.food_id as fu_food_id, fu.unit_type_id as fu_unit_type_id,";
-        sql += " ut.descrip as ut_unit_type_descrip";
-        sql += " from preparation_details as pd";
-        sql += " left join foods as f on f.id = pd.food_id";
-        sql += " left join factor_units as fu on fu.id = pd.factor_unit_id";
-        sql += " left join unit_types as ut on ut.id = fu.unit_type_id";
-        sql += " where pd.preparation_id = ?";
-        
-        System.out.println(sql);
+        String sql = "select pd.preparation_id,\n" +
+        "pd.id, pd.amount,\n" +
+        "f.id as food_id, f.descrip as food_descrip,\n" +
+        "fu.id as factor_unit_id, fu.descrip as factor_unit_descrip,\n" +
+        "ut.id as unit_type_id, ut.descrip as unit_type_descrip\n" +
+        "from preparation_details as pd\n" +
+        "left join foods as f on f.id = pd.food_id\n" +
+        "left join factor_units as fu on fu.id = pd.factor_unit_id\n" +
+        "left join unit_types as ut on ut.id = fu.unit_type_id\n" +
+        "where pd.preparation_id=?";
         
         ArrayList<PreparationDetail> list = null;
         try {
@@ -224,10 +220,9 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
                 item.setFood( new Food(rs.getInt("food_id"), rs.getString("food_descrip")));
                 item.setFactorUnit( new FactorUnit(
                         rs.getInt("factor_unit_id"),
-                        rs.getString("fu_descrip"),
-                        rs.getDouble("fu_factor"),
-                        new Food(rs.getInt("fu_food_id")),
-                        new UnitType(rs.getInt("fu_unit_type_id"), rs.getString("ut_unit_type_descrip") )
+                        rs.getString("factor_unit_descrip"),
+                        new Food(rs.getInt("food_id"), rs.getString("food_descrip")),
+                        new UnitType(rs.getInt("unit_type_id"), rs.getString("unit_type_descrip") )
                 ));
                 list.add(item);
             }

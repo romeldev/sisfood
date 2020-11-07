@@ -8,7 +8,10 @@ package view.setting;
 import bo.CompanyBO;
 import bo.PreparationBO;
 import bo.PreparationTypeBO;
+import common.Validator;
 import entity.Company;
+import entity.Food;
+import entity.FoodType;
 import entity.Preparation;
 import entity.PreparationDetail;
 import entity.PreparationType;
@@ -19,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import view.assets.PreparationDetailTM;
 import view.assets.PreparationTM;
 import view.assets.TableRender;
@@ -99,8 +103,7 @@ public class PreparationView extends javax.swing.JFrame {
         });
     }
     
-    private void initTablePreparation()
-    {
+    private void initTablePreparation(){
         tblPreparations.setDefaultRenderer(Object.class, new TableRender());
         tblPreparations.setModel(preparationTM);
         tblPreparations.setRowHeight(30);
@@ -108,8 +111,7 @@ public class PreparationView extends javax.swing.JFrame {
         tblPreparations.getColumnModel().getColumn(2).setMaxWidth(30);
     }
     
-    private void initTablePreparationDetail()
-    {
+    private void initTablePreparationDetail(){
         tblPreparationDetail.setDefaultRenderer(Object.class, new TableRender());
         tblPreparationDetail.setModel(preparationDetailTM);
         tblPreparationDetail.setRowHeight(30);
@@ -118,30 +120,27 @@ public class PreparationView extends javax.swing.JFrame {
         tblPreparationDetail.getColumnModel().getColumn(5).setMaxWidth(30);
     }
     
-    private void searchPreparation()
-    {
+    private void searchPreparation(){
         int companyId = ((Company) cbxCompany.getSelectedItem()).getId();
         int preparationTypeId = ((PreparationType) cbxPreparationType.getSelectedItem()).getId();
-
+        
         preparations = preparationBO.search( companyId, preparationTypeId ,txtSearchPreparation.getText());
         preparationTM.setData(preparations);
         preparationTM.fireTableDataChanged();
     }
     
-    
-    private void clearForm()
-    {
+    private void clearForm(){
         preparation = new Preparation();
         txtId.setText(null);
         txtDescrip.setText(null);
         
+        btnDelete.setVisible(false);
         preparationDetailTM.getData().clear();
         preparationDetailTM.fireTableDataChanged();
         tblPreparations.getSelectionModel().clearSelection();
     }
     
-    private void editForm()
-    {
+    private void editForm(){
         preparation.setPreparationDetails(preparationBO.getPreparationDetails(preparation.getId()));
         txtId.setText(preparation.getId()+"");
         txtDescrip.setText(preparation.getDescrip());
@@ -154,11 +153,36 @@ public class PreparationView extends javax.swing.JFrame {
         }
         preparationDetailTM.setData(preparation.getPreparationDetails());
         preparationDetailTM.fireTableDataChanged();
+        btnDelete.setVisible(true);
     }
+    
+    
+    private int indexDetailEdit = -1;
     
     public void addPreparationDetail( PreparationDetail item){
         
-        preparation.getPreparationDetails().add(item);
+        Food food = new Food();
+        food.setId( item.getFood().getId());
+        food.setDescrip( item.getFood().getDescrip());
+        
+        item = new PreparationDetail( 
+            item.getId(), 
+            preparation, 
+            food,
+            item.getFactorUnit(), 
+            item.getAmount()
+        );
+        
+        
+        
+        
+        if( indexDetailEdit == -1){
+            preparation.getPreparationDetails().add(item);
+        }else{
+            preparation.getPreparationDetails().set(indexDetailEdit, item);
+        }
+
+        
         preparationDetailTM.setData(preparation.getPreparationDetails());
         preparationDetailTM.fireTableDataChanged();
     }
@@ -429,11 +453,51 @@ public class PreparationView extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescripActionPerformed
 
     private void btnAddFoodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFoodActionPerformed
+        indexDetailEdit = -1;
         searchFood.open(null);
     }//GEN-LAST:event_btnAddFoodActionPerformed
 
-    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+    public boolean validator()
+    {
+        int companyId = ((Company)cbxCompany.getSelectedItem()).getId();
+        int preparationTypeId = ((PreparationType)cbxPreparationType.getSelectedItem()).getId();
         
+        if( companyId==0){
+            JOptionPane.showMessageDialog(this, "Seleccione una compania");
+            cbxCompany.requestFocus();
+            return false;
+        }
+        
+        if( preparationTypeId==0){
+            JOptionPane.showMessageDialog(this, "Seleccione un tipo de preparacion");
+            cbxPreparationType.requestFocus();
+            return false;
+        }
+        
+        if( !Validator.isRequired(txtDescrip.getText())){
+            JOptionPane.showMessageDialog(this, "Ingrese una descripcion");
+            txtDescrip.requestFocus();
+            return false;
+        }
+        
+        if( preparation.getPreparationDetails().size()==0){
+            JOptionPane.showMessageDialog(this, "Agrege al menos un alimento");
+            btnAddFood.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+    
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        //validar datos
+        
+        if (!validator()) return;
+        
+        preparation.setDescrip( txtDescrip.getText() );
+        preparation.setPreparationType( ((PreparationType)cbxPreparationType.getSelectedItem()) );
+        preparation.setCompany(((Company)cbxCompany.getSelectedItem()) );
+        preparationBO.save(preparation);
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -460,12 +524,9 @@ public class PreparationView extends javax.swing.JFrame {
             if ( value instanceof JButton){
                 JButton btn = (JButton) value;
                 preparation = preparations.get(row);
-                
                 if(btn.getName().equals("EDIT")){
                     editForm();
                 }
-                
-                
             }
         }
     }//GEN-LAST:event_tblPreparationsMouseClicked
@@ -493,6 +554,7 @@ public class PreparationView extends javax.swing.JFrame {
                 }
                 
                 if(btn.getName().equals("EDIT")){
+                    indexDetailEdit = row;
                     PreparationDetail pd = preparation.getPreparationDetails().get(row);
                     searchFood.open(pd);
                 }

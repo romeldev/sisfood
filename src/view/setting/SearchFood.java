@@ -15,14 +15,11 @@ import entity.Nutrient;
 import entity.Preparation;
 import entity.PreparationDetail;
 import entity.UnitType;
-import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -46,6 +43,7 @@ public class SearchFood extends javax.swing.JDialog {
     ArrayList<Food> foodResults = new ArrayList<>();
     
     ArrayList<FoodType> foodTypes = new ArrayList<>();
+    ArrayList<FactorUnit> factorUnits = new ArrayList<>();
 
     Food food = new Food();
     
@@ -72,26 +70,34 @@ public class SearchFood extends javax.swing.JDialog {
         this.preparationView = preparationView;
     }
     
-    public void open( PreparationDetail preparationDetail )
+    private void getFactorUnits( int foodId ){
+        factorUnits = factorUnitBO.listByFoodId(foodId);
+    }
+    
+    public void open( PreparationDetail preparationDetailEdit )
     {
         tblResults.getSelectionModel().clearSelection();
-
-        if( preparationDetail==null){
-            this.preparationDetail = new PreparationDetail();
-            this.preparationDetail.setAmount(0.0);
-            Food food = new Food();
-            food.setFactorUnits(new ArrayList<>() );
-            this.preparationDetail.setFood(food);
+        if( preparationDetailEdit != null){
+            food = preparationDetailEdit.getFood();
+            preparationDetail = preparationDetailEdit;
         }else{
-            preparationDetail.getFood().setFactorUnits( factorUnitBO.listByFoodId(preparationDetail.getFood().getId()) );
-            
-            this.preparationDetail = preparationDetail;
+            food.setId(0);
+            food.setDescrip(null);
+            preparationDetail.setId(0);
+            preparationDetail.setAmount(0.0);
+            preparationDetail.setFood(food);
+            preparationDetail.setFactorUnit(new FactorUnit(0));
         }
-        txtId.setText( this.preparationDetail.getFood().getId()+"" );
-        txtDescrip.setText( this.preparationDetail.getFood().getDescrip() );
-        txtAmount.setText( this.preparationDetail.getAmount()+"" );
+        
+        fillForm();
+    }
+    
+    private void fillForm(){
+        txtId.setText(food.getId()+"");
+        txtDescrip.setText(food.getDescrip());
+        txtAmount.setText(preparationDetail.getAmount()+"");
+        factorUnits = factorUnitBO.listByFoodId(food.getId());
         txtFactorUnit.setText(null);
-
         fillCbxUnitType(cbxUnitType);
         this.setVisible(true);
     }
@@ -155,44 +161,6 @@ public class SearchFood extends javax.swing.JDialog {
         }
         tblResults.setModel(tblModel);
     }
-
-    public void search()
-    {
-        FoodType foodType = (FoodType) cbxFoodType.getSelectedItem();
-        int foodTypeId = foodType.getId();
-        String columnSearch = cbxSearchBy.getSelectedItem().toString();
-        String column = "unknown";
-        if( columnSearch.equals("Descripcion")){
-            column = "descrip";
-        }else{
-            for (HashMap<String, String> nutrient : nutrients) {
-                String columnN = nutrient.keySet().toArray()[0].toString();
-                if( nutrient.get(columnN).equals(columnSearch)){
-                    column = columnN;
-                    break;
-                }
-            }
-        }
-        
-        String search = txtSearch.getText();
-        foods = foodBO.searchWithNutrients(column, search, foodTypeId);
-        
-        DefaultTableModel tblModel = (DefaultTableModel) tblResults.getModel();
-        tblModel.setRowCount(0);
-        
-        String[] row = new String[nutrients.size()+1];
-        int rowCount = 0;
-        for (Food food : foods) {
-            row[0] = food.getDescrip();
-            for (int i = 0; i < nutrients.size(); i++) {
-                String columnN = nutrients.get(i).keySet().toArray()[0].toString();
-                row[i+1] = food.getNutrients().get(columnN);
-            }
-            tblModel.insertRow(rowCount, row);
-            rowCount++;
-        }
-        tblResults.setModel(tblModel);
-    }
     
     public void initFoodType(JComboBox cbx){
         cbx.removeAllItems();
@@ -212,9 +180,15 @@ public class SearchFood extends javax.swing.JDialog {
     
     public void fillCbxUnitType(JComboBox cbx){
         cbx.removeAllItems();
-        for (int i = 0; i < preparationDetail.getFood().getFactorUnits().size(); i++) {
-            cbx.addItem(preparationDetail.getFood().getFactorUnits().get(i).getUnitType());
+        
+        int itemSelected = -1;
+        for (int i = 0; i < factorUnits.size(); i++) {
+            cbx.addItem(factorUnits.get(i).getUnitType());
+            if( preparationDetail.getFactorUnit().getId() == factorUnits.get(i).getId() ){
+                itemSelected = i;
+            }
         }
+        if( itemSelected>0 ) cbx.setSelectedIndex(itemSelected);
     }
     
     public void initTable()
@@ -475,18 +449,15 @@ public class SearchFood extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    private int rowSelected = -1;
     private void tblResultsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblResultsMouseClicked
         if( evt.getClickCount() == 2){
-            food = foods.get(tblResults.getSelectedRow());
-            food.setFactorUnits( factorUnitBO.listByFoodId(food.getId()) );
-            
-            txtId.setText(food.getId()+"");
-            txtDescrip.setText(food.getDescrip());
-            txtAmount.setText("1.0");
-            
+            food = foodResults.get(tblResults.getSelectedRow());
+            preparationDetail.setId(0);
+//            preparationDetail.setAmount(0.0);
             preparationDetail.setFood(food);
-            fillCbxUnitType(cbxUnitType);
+            preparationDetail.setFactorUnit(new FactorUnit(0));
+            fillForm();
         }
     }//GEN-LAST:event_tblResultsMouseClicked
 
@@ -497,7 +468,7 @@ public class SearchFood extends javax.swing.JDialog {
     private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
         // TODO add your handling code here:
         if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-            search();
+            searchLocal();
         }
     }//GEN-LAST:event_txtSearchKeyPressed
 
@@ -538,24 +509,21 @@ public class SearchFood extends javax.swing.JDialog {
     }//GEN-LAST:event_txtIdKeyPressed
 
     private void btnAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAcceptActionPerformed
-        if( preparationView!=null ){
-            preparationDetail.setId(0);
-            preparationDetail.setAmount( Double.parseDouble(txtAmount.getText()) );
-            preparationDetail.setPreparation( new Preparation() );
-            preparationDetail.setFood( food );
-            preparationView.addPreparationDetail(preparationDetail);
-            this.setVisible(false);
-        }
+        preparationDetail.setId(0);
+        preparationDetail.setAmount( Double.parseDouble(txtAmount.getText()) );
+        preparationDetail.setFood( food );
+        preparationDetail.setFactorUnit( factorUnits.get(cbxUnitType.getSelectedIndex()) );
+        preparationView.addPreparationDetail(preparationDetail);
+        
+        this.setVisible(false);
     }//GEN-LAST:event_btnAcceptActionPerformed
 
     private void cbxUnitTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxUnitTypeItemStateChanged
         if (evt.getStateChange() == ItemEvent.SELECTED) {
-            int unitTypeId = ((UnitType) cbxUnitType.getSelectedItem()).getId();
-            txtFactorUnit.setText("");
-            for (int i = 0; i < preparationDetail.getFood().getFactorUnits().size(); i++) {
-                if( preparationDetail.getFood().getFactorUnits().get(i).getUnitType().getId() == unitTypeId ){
-                    preparationDetail.setFactorUnit(preparationDetail.getFood().getFactorUnits().get(i));
-                    txtFactorUnit.setText( preparationDetail.getFactorUnit().getDescrip() );
+            int detailUnitTypeId = ((UnitType) cbxUnitType.getSelectedItem()).getId();
+            for (int i = 0; i < factorUnits.size(); i++) {
+                if( detailUnitTypeId == factorUnits.get(i).getUnitType().getId() ){
+                    txtFactorUnit.setText(factorUnits.get(i).getDescrip());
                     break;
                 }
             }

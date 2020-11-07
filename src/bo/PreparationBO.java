@@ -52,17 +52,22 @@ public class PreparationBO {
         return preparationDAO.create(conn, item);
     }
     
+    public boolean save( Preparation preparation){
+        
+        if( preparation.getId()==0 ){
+            create(preparation);
+        }else{
+            update(preparation);
+        }
+        
+        preparationDetailDAO.createMultiple(Conexion.getConnection(), preparation.getPreparationDetails());
+        return true;
+    }
+    
     public ArrayList<PreparationDetail> getPreparationDetails(int preparationId)
     {
         Connection conn = Conexion.getConnection();
         ArrayList<PreparationDetail> list = preparationDetailDAO.listDetailOfPreparation(conn, preparationId);
-        
-        //por cada elemento objeter sus unidades
-//        for (PreparationDetail preparationDetail : list) {
-//            ArrayList<FactorUnit> factorUnits = new ArrayList<>();
-//            factorUnits = factorUnitDAO.listByFoodId(Conexion.getConnection(), preparationDetail.getFood().getId());
-//            preparationDetail.getFood().setFactorUnits(factorUnits);
-//        }
         return list;
     }
 }

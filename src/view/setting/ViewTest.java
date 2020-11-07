@@ -5,6 +5,9 @@
  */
 package view.setting;
 
+import dao.CompanyDAO;
+import dao.Conexion;
+import dao.Query;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultCellEditor;
@@ -13,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import org.json.simple.JSONArray;
 
 /**
  *
@@ -29,41 +33,11 @@ public class ViewTest extends javax.swing.JFrame {
     public ViewTest() {
         initComponents();
         
-        editorData.add( new String[]{ "Red", "Blue", "Green" } );
-        editorData.add( new String[]{ "Circle", "Square", "Triangle" } );
-        editorData.add( new String[]{ "Apple", "Orange", "Banana" } );
- 
-        //  Create the table with default data
- 
-        Object[][] data =
-        {
-            {"Color", "Red"},
-            {"Shape", "Square"},
-            {"Fruit", "Banana"},
-            {"Plain", "Text"}
-        };
-        String[] columnNames = {"Type","Value"};
- 
-        DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable(model)
-        {
-            //  Determine editor to be used by row
-                public TableCellEditor getCellEditor(int row, int column)
-            {
-                int modelColumn = convertColumnIndexToModel( column );
- 
-                if (modelColumn == 1 && row < 3)
-                {
-                    JComboBox<String> comboBox1 = new JComboBox<String>( editorData.get(row));
-                    return new DefaultCellEditor( comboBox1 );
-                }
-                else
-                    return super.getCellEditor(row, column);
-            }
-        };
- 
-        JScrollPane scrollPane = new JScrollPane( table );
-        add( scrollPane );
+        CompanyDAO dao = new CompanyDAO();
+        for (int i = 0; i < 20; i++) {
+            System.out.println( dao.list(Conexion.getConnection()) );
+        }
+        
     }
 
     /**
@@ -75,21 +49,49 @@ public class ViewTest extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(118, 118, 118)
+                .addComponent(jButton1)
+                .addContainerGap(209, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(81, 81, 81)
+                .addComponent(jButton1)
+                .addContainerGap(196, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        
+        for (int i = 0; i < 100; i++) {
+            JSONArray data = Query.execute("select id, descrip from foods");
+            for (Object object : data) {
+                System.out.println(object);
+            }
+        }
+        
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -127,5 +129,6 @@ public class ViewTest extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
 }
