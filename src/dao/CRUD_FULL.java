@@ -15,9 +15,9 @@ import java.util.ArrayList;
  */
 public interface CRUD_FULL <T> {
     
-    public ArrayList<T> list(Connection conn);
-    public T read(Connection conn, Integer id);
-    public boolean create(Connection conn, T entity);
-    public boolean update(Connection conn, T entity);
-    public boolean delete(Connection conn, Integer id);
+    public ArrayList<T> list(Connection conn, boolean soft);
+    public T read(Connection conn, Integer id, boolean soft);
+    public Integer create(Connection conn, T entity);
+    public Integer update(Connection conn, T entity);
+    public Integer delete(Connection conn, Integer id, boolean soft);
 }

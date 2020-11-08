@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view.setting;
+package view.programing.food;
 
+import view.programing.PreparationView;
 import bo.FactorUnitBO;
-import bo.FoodTypeBO;
+import bo.IngredientTypeBO;
 import bo.FoodBO;
 import entity.FactorUnit;
 import entity.Food;
-import entity.FoodType;
+import entity.IngredientType;
 import entity.Nutrient;
 import entity.Preparation;
 import entity.PreparationDetail;
@@ -34,7 +35,7 @@ public class SearchFood extends javax.swing.JDialog {
     
     ArrayList<HashMap<String, String>> nutrients = Nutrient.Items();
     
-    FoodTypeBO  foodTypeBO = new FoodTypeBO();
+    IngredientTypeBO  foodTypeBO = new IngredientTypeBO();
     FactorUnitBO factorUnitBO = new FactorUnitBO();
     
     FoodBO foodBO = new FoodBO();
@@ -42,7 +43,7 @@ public class SearchFood extends javax.swing.JDialog {
     ArrayList<Food> foods = new ArrayList<>();
     ArrayList<Food> foodResults = new ArrayList<>();
     
-    ArrayList<FoodType> foodTypes = new ArrayList<>();
+    ArrayList<IngredientType> foodTypes = new ArrayList<>();
     ArrayList<FactorUnit> factorUnits = new ArrayList<>();
 
     Food food = new Food();
@@ -113,7 +114,7 @@ public class SearchFood extends javax.swing.JDialog {
 
         String search = txtSearch.getText().trim();
         String columnSearch = cbxSearchBy.getSelectedItem().toString();
-        int foodTypeId = ((FoodType) cbxFoodType.getSelectedItem()).getId();
+        int foodTypeId = ((IngredientType) cbxFoodType.getSelectedItem()).getId();
         
         if( columnSearch.equals("Descripcion")){
             for (Food food : foods) {
@@ -165,8 +166,8 @@ public class SearchFood extends javax.swing.JDialog {
     public void initFoodType(JComboBox cbx){
         cbx.removeAllItems();
         foodTypes = foodTypeBO.list();
-        cbx.addItem(new FoodType(0, "Todos", null));
-        for (FoodType foodType : foodTypes)  cbx.addItem(foodType);
+        cbx.addItem(new IngredientType(0, "Todos", null));
+        for (IngredientType foodType : foodTypes)  cbx.addItem(foodType);
     }
     
     public void fillCbxSearchBy(JComboBox cbx){
@@ -241,7 +242,6 @@ public class SearchFood extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setModal(true);
-        setPreferredSize(new java.awt.Dimension(1000, 500));
 
         pnlSearchFood.setBorder(javax.swing.BorderFactory.createTitledBorder("Buscar Alimento"));
 

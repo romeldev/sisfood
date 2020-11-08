@@ -8,6 +8,7 @@ package view.setting;
 import bo.CurrencyTypeBO;
 import common.Helper;
 import common.Validator;
+import entity.Company;
 import entity.CurrencyType;
 import java.awt.Cursor;
 import java.util.ArrayList;
@@ -34,22 +35,38 @@ public class CurrencyTypeView extends javax.swing.JFrame {
         initComponents();
         txtId.setEnabled(false);
         this.setLocationRelativeTo(null);
-        tblList.getTableHeader().setReorderingAllowed(false) ;
+        
+        clearForm();
+        initTable();
+        search();
+    }
+    
+    
+    private void initTable(){
         tblList.setModel(tblModel);
-        tblList.setDefaultRenderer(Object.class, new TableRender());
         tblList.setRowHeight(30);
-        fillList();
+        tblList.getTableHeader().setReorderingAllowed(false) ;
+        tblList.setDefaultRenderer(Object.class, new TableRender());
         tblList.getColumnModel().getColumn(0).setMaxWidth(50);
-        tblList.getColumnModel().getColumn(2).setMaxWidth(30);
+        tblList.getColumnModel().getColumn(2).setMaxWidth(50);
         tblList.getColumnModel().getColumn(3).setMaxWidth(30);
         tblList.getColumnModel().getColumn(4).setMaxWidth(30);
     }
     
-    public void fillList()
-    {
+    private void search(){
         list = currencyTypeBO.list();
         tblModel.setData(list);
         tblModel.fireTableDataChanged();
+    }
+    
+    private void clearForm(){
+        item = new CurrencyType();
+        txtId.setEnabled(false);
+        txtId.setText(item.getId()+"");
+        txtDescrip.setText(item.getDescrip());
+        txtSymbol.setText(item.getSymbol());
+        btnSave.setText("GUARDAR");
+        btnSave.setIcon(Helper.icon("btn_save"));
     }
     
     public boolean validator()
@@ -243,16 +260,6 @@ public class CurrencyTypeView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void clearForm()
-    {
-        item = new CurrencyType();
-        txtId.setText("");
-        txtDescrip.setText("");
-        txtSymbol.setText("");
-        btnSave.setText("GUARDAR");
-        btnSave.setIcon(Helper.icon("btn_save"));
-    }
-    
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         // TODO add your handling code here:
         clearForm();
@@ -288,7 +295,7 @@ public class CurrencyTypeView extends javax.swing.JFrame {
                     int confirm = JOptionPane.showConfirmDialog(this, "Eliminar "+item.getDescrip()+"?", "Alerta", JOptionPane.YES_OPTION);
                     if( confirm == JOptionPane.YES_OPTION){
                         if( currencyTypeBO.delete(item) ){
-                            fillList();
+                            search();
                             JOptionPane.showMessageDialog(this, item.getDescrip()+" eliminado!");
                             clearForm();
                         }
@@ -334,7 +341,7 @@ public class CurrencyTypeView extends javax.swing.JFrame {
             message += " actualizado!";
         }
         if( success ){
-            fillList();
+            search();
             clearForm();
             JOptionPane.showMessageDialog(this, message);
         }

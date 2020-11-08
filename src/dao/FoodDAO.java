@@ -7,7 +7,7 @@ package dao;
 
 import entity.Company;
 import entity.Food;
-import entity.FoodType;
+import entity.IngredientType;
 import entity.Nutrient;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,7 +46,7 @@ public class FoodDAO implements CRUD_FULL<Food>{
                 Food item = new Food();
                 item.setId(rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
-                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                item.setFoodType(new IngredientType(rs.getInt("food_type_id")));
                 list.add(item);
             }
             conn.close();
@@ -69,7 +69,7 @@ public class FoodDAO implements CRUD_FULL<Food>{
             if (rs.next()) {
                 item.setId(rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
-                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                item.setFoodType(new IngredientType(rs.getInt("food_type_id")));
             }
             conn.close();
         } catch (SQLException ex) {
@@ -149,7 +149,7 @@ public class FoodDAO implements CRUD_FULL<Food>{
                 Food item = new Food();
                 item.setId(rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
-                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                item.setFoodType(new IngredientType(rs.getInt("food_type_id")));
                 list.add(item);
             }
             conn.close();
@@ -175,7 +175,7 @@ public class FoodDAO implements CRUD_FULL<Food>{
                 Food item = new Food();
                 item.setId(rs.getInt("food_id"));
                 item.setDescrip(rs.getString("descrip"));
-                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                item.setFoodType(new IngredientType(rs.getInt("food_type_id")));
                 
                 HashMap<String, String> nutrients = new HashMap<>();
                 for (String nutrientColumn : nutrientColumns) {
@@ -209,7 +209,7 @@ public class FoodDAO implements CRUD_FULL<Food>{
                 Food item = new Food();
                 item.setId(rs.getInt("food_id"));
                 item.setDescrip(rs.getString("descrip"));
-                item.setFoodType(new FoodType(rs.getInt("food_type_id")));
+                item.setFoodType(new IngredientType(rs.getInt("food_type_id")));
                 
                 HashMap<String, String> nutrients = new HashMap<>();
                 for (String nutrientColumn : nutrientColumns) {

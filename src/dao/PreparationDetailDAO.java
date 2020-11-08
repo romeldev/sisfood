@@ -17,7 +17,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.apache.commons.dbutils.DbUtils;
 
 /**
  *
@@ -36,8 +39,8 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
 
     @Override
     public ArrayList<PreparationDetail> list(Connection conn) {
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "select * from "+table;
         ArrayList<PreparationDetail> list = null;
         try {
@@ -53,17 +56,24 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
                 item.setFactorUnit( new FactorUnit(rs.getInt("factor_unit_id")) );
                 list.add(item);
             }
-            conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return list;
     }
 
     @Override
     public PreparationDetail read(Connection conn, Integer id) {
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "select * from "+table+" where id=?";
         PreparationDetail item = null;
         try {
@@ -79,9 +89,16 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
                 item.setFood( new Food(rs.getInt("food_id")) );
                 item.setFactorUnit( new FactorUnit(rs.getInt("food_id")) );
             }
-            conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return item;
     }
@@ -89,8 +106,8 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
     @Override
     public boolean create(Connection conn, PreparationDetail entity) {
         boolean status = false;
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "insert into "+table+" (amount, preparation_id, food_id, factor_unit_id) values (?,?,?,?)";
         try {
             ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -101,10 +118,17 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
             int rows  = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if( rs.next()) entity.setId(rs.getInt(1));
-            ps.close();
-            status = true;
+            status = rows==1;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
@@ -112,7 +136,8 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
     @Override
     public boolean update(Connection conn, PreparationDetail entity) {
         boolean status = false;
-        PreparedStatement ps;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "update "+table+" set amount=?, preparation_id=?, food_id=?, factor_unit_id=? where id=?";
 
         try {
@@ -122,11 +147,18 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
             ps.setInt(3, entity.getFood().getId());
             ps.setInt(4, entity.getFactorUnit().getId());
             ps.setInt(5, entity.getId());
-            ps.execute();
-            ps.close();
-            status = true;
+            int rows  = ps.executeUpdate();
+            status = rows==1;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
@@ -134,67 +166,87 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
     @Override
     public boolean delete(Connection conn, Integer id) {
         boolean status = false;
-        PreparedStatement ps;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "delete from "+table+" where id=?";
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
-            ps.execute();
-            ps.close();
-            status = true;
+            int rows  = ps.executeUpdate();
+            status = rows==1;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
     
     public boolean createMultiple(Connection conn, ArrayList<PreparationDetail> list) {
         boolean status = false;
-        PreparedStatement ps;
-        ResultSet rs;
-        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String values = String.join(",",Collections.nCopies(list.size(), "(?,?,?,?)"));
         String sql = "insert into "+table+" (amount, preparation_id, food_id, factor_unit_id) values "+values;
         try {
             ps = conn.prepareStatement(sql);
             int index = 1;
             for (PreparationDetail entity : list) {
-                System.out.println(entity.getAmount());
                 ps.setDouble(index++, entity.getAmount());
                 ps.setInt(index++, entity.getPreparation().getId());
                 ps.setInt(index++, entity.getFood().getId());
                 ps.setInt(index++, entity.getFactorUnit().getId());
             }
-            System.out.println(ps);
             int rows  = ps.executeUpdate();
-            System.out.println(rows);
-            ps.close();
-            status = true;
+            status = list.size()==rows;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
     
     public boolean deleteByPreparationId(Connection conn, Integer preparationId) {
         boolean status = false;
-        PreparedStatement ps;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "delete from "+table+" where preparation_id=?";
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, preparationId);
-            ps.execute();
-            ps.close();
-            status = true;
+            int rows  = ps.executeUpdate();
+            System.out.println(rows);
+            status = rows==1;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return status;
     }
     
     public ArrayList<PreparationDetail> listDetailOfPreparation(Connection conn, Integer preparationId) {
-        PreparedStatement ps;
-        ResultSet rs;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String sql = "select pd.preparation_id,\n" +
         "pd.id, pd.amount,\n" +
         "f.id as food_id, f.descrip as food_descrip,\n" +
@@ -226,9 +278,16 @@ public class PreparationDetailDAO implements CRUD_FULL<PreparationDetail>{
                 ));
                 list.add(item);
             }
-            conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
+        } finally {
+            try {
+                DbUtils.close(rs);
+                DbUtils.close(ps);
+                DbUtils.close(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(CompanyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return list;
     }

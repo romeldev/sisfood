@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view.setting;
+package view.programing;
 
 import bo.CompanyBO;
 import bo.PreparationBO;
@@ -11,7 +11,7 @@ import bo.PreparationTypeBO;
 import common.Validator;
 import entity.Company;
 import entity.Food;
-import entity.FoodType;
+import entity.IngredientType;
 import entity.Preparation;
 import entity.PreparationDetail;
 import entity.PreparationType;
@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import view.assets.PreparationDetailTM;
 import view.assets.PreparationTM;
 import view.assets.TableRender;
+import view.programing.food.SearchFood;
 
 /**
  *
@@ -490,14 +491,18 @@ public class PreparationView extends javax.swing.JFrame {
     }
     
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        //validar datos
-        
         if (!validator()) return;
-        
         preparation.setDescrip( txtDescrip.getText() );
         preparation.setPreparationType( ((PreparationType)cbxPreparationType.getSelectedItem()) );
         preparation.setCompany(((Company)cbxCompany.getSelectedItem()) );
-        preparationBO.save(preparation);
+        
+        String message = "Preparacion "+ preparation.getDescrip()+" ";
+        message = preparation.getId()==0? "guardado!": "actualizado!";
+        if( preparationBO.save(preparation) ) {
+            JOptionPane.showMessageDialog(this, message, "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            clearForm();
+            searchPreparation();
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -505,7 +510,12 @@ public class PreparationView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        
+        String message = "Preparacion "+preparation.getDescrip()+" eliminado!";
+        if( preparationBO.delete(preparation) ) {
+            JOptionPane.showMessageDialog(this, message, "Mensaje", JOptionPane.INFORMATION_MESSAGE);
+            clearForm();
+            searchPreparation();
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void txtSearchPreparationKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchPreparationKeyPressed

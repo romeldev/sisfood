@@ -5,46 +5,32 @@
  */
 package bo;
 
-import common.Helper;
-import dao.FoodTypeDAO;
-import dao.Conexion;
-import entity.FoodType;
-import java.sql.Connection;
+import dao.IngredientTypeDAO;
+import dao.DB;
+import entity.IngredientType;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author HP_RYZEN
  */
-public class FoodTypeBO {
+public class IngredientTypeBO {
     
-    private FoodTypeDAO foodTypeDAO = new FoodTypeDAO();
+    private IngredientTypeDAO foodTypeDAO = new IngredientTypeDAO();
     
-    public ArrayList<FoodType> list()
-    {
-        Connection conn = Conexion.getConnection();
-        ArrayList<FoodType> list = null;
-        try {
-            list = Helper.castList(foodTypeDAO.list(conn));
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-        return list;
+    public ArrayList<IngredientType> list(){
+        return foodTypeDAO.list(DB.conn(), true);
     }
     
-    public boolean update( Object item){
-        Connection conn = Conexion.getConnection();
-        return foodTypeDAO.update(conn, item);
+    public boolean update( IngredientType item){
+        return foodTypeDAO.update(DB.conn(), item)==1;
     }
     
-    public boolean create( Object item ) {
-        Connection conn = Conexion.getConnection();
-        return foodTypeDAO.create(conn, item);
+    public boolean create( IngredientType item ) {
+        return foodTypeDAO.create(DB.conn(), item)==1;
     }
     
-    public boolean delete( Object item ) {
-        Connection conn = Conexion.getConnection();
-        return foodTypeDAO.delete(conn, item);
+    public boolean delete( IngredientType item ) {
+        return foodTypeDAO.delete(DB.conn(), item.getId(), true)==1;
     }
 }

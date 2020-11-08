@@ -16,7 +16,7 @@ public class Food {
     
     private int id;
     private String descrip;
-    private FoodType foodType;
+    private IngredientType foodType;
     private ArrayList<FactorUnit> factorUnits;
     private HashMap<String, String> nutrients;
 
@@ -30,13 +30,13 @@ public class Food {
     
     
     
-    public Food(int id, String descrip, FoodType foodType) {
+    public Food(int id, String descrip, IngredientType foodType) {
         this.id = id;
         this.descrip = descrip;
         this.foodType = foodType;
     }
 
-    public Food(String descrip, FoodType foodType) {
+    public Food(String descrip, IngredientType foodType) {
         this.descrip = descrip;
         this.foodType = foodType;
     }
@@ -61,11 +61,11 @@ public class Food {
         this.descrip = descrip;
     }
 
-    public FoodType getFoodType() {
+    public IngredientType getFoodType() {
         return foodType;
     }
 
-    public void setFoodType(FoodType foodType) {
+    public void setFoodType(IngredientType foodType) {
         this.foodType = foodType;
     }
 

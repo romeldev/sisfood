@@ -100,8 +100,8 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
     }
 
     @Override
-    public boolean create(Connection conn, Preparation entity) {
-        boolean status = false;
+    public Integer create(Connection conn, Preparation entity) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "insert into "+table+" (descrip, preparation_type_id, company_id) values (?,?,?)";
@@ -110,10 +110,9 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
             ps.setString(1, entity.getDescrip());
             ps.setInt(2, entity.getPreparationType().getId());
             ps.setInt(3, entity.getCompany().getId());
-            int rows  = ps.executeUpdate();
+            status  = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if( rs.next()) entity.setId(rs.getInt(1));
-            status = rows==1;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -129,8 +128,8 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
     }
     
     @Override
-    public boolean update(Connection conn, Preparation entity) {
-        boolean status = false;
+    public Integer update(Connection conn, Preparation entity) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "update "+table+" set descrip=?, preparation_type_id=?, company_id=? where id=?";
@@ -140,9 +139,7 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
             ps.setInt(2, entity.getPreparationType().getId());
             ps.setInt(3, entity.getCompany().getId());
             ps.setInt(4, entity.getId());
-            System.out.println(ps);
-            int rows  = ps.executeUpdate();
-            status = rows==1;
+            status  = ps.executeUpdate();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -158,16 +155,15 @@ public class PreparationDAO implements CRUD_FULL<Preparation>{
     }
 
     @Override
-    public boolean delete(Connection conn, Integer id) {
-        boolean status = false;
+    public Integer delete(Connection conn, Integer id) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "delete from "+table+" where id=?";
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
-            int rows  = ps.executeUpdate();
-            status = rows==1;
+            status  = ps.executeUpdate();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {

@@ -9,15 +9,9 @@ import dao.Conexion;
 import dao.FactorUnitDAO;
 import dao.PreparationDAO;
 import dao.PreparationDetailDAO;
-import entity.FactorUnit;
 import entity.Preparation;
 import entity.PreparationDetail;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author HP_RYZEN
@@ -52,15 +46,24 @@ public class PreparationBO {
         return preparationDAO.create(conn, item);
     }
     
-    public boolean save( Preparation preparation){
+    public boolean delete( Preparation item ) {
+        boolean detailDeleted = preparationDetailDAO.deleteByPreparationId(Conexion.getConnection(), item.getId());
         
+        boolean itemDeleted = preparationDAO.delete(Conexion.getConnection(), item.getId());
+
+        
+        System.out.println("item deleted: "+ itemDeleted);
+        System.out.println("detail deleted: "+ detailDeleted);
+        return true;
+    }
+    
+    public boolean save( Preparation preparation){
         if( preparation.getId()==0 ){
             create(preparation);
         }else{
             update(preparation);
         }
-        
-        preparationDetailDAO.createMultiple(Conexion.getConnection(), preparation.getPreparationDetails());
+        boolean detailInserted = preparationDetailDAO.createMultiple(Conexion.getConnection(), preparation.getPreparationDetails());
         return true;
     }
     

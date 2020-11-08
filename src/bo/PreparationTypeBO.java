@@ -5,13 +5,10 @@
  */
 package bo;
 
-import common.Helper;
 import dao.PreparationTypeDAO;
-import dao.Conexion;
+import dao.DB;
 import entity.PreparationType;
-import java.sql.Connection;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,30 +18,20 @@ public class PreparationTypeBO {
     
     private PreparationTypeDAO preparationTypeDAO = new PreparationTypeDAO();
     
-    public ArrayList<PreparationType> list()
-    {
-        Connection conn = Conexion.getConnection();
-        ArrayList<PreparationType> list = null;
-        try {
-            list = Helper.castList(preparationTypeDAO.list(conn));
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-        return list;
+    public ArrayList<PreparationType> list(){
+        return preparationTypeDAO.list(DB.conn(), true);
     }
     
     public boolean update( PreparationType item){
-        Connection conn = Conexion.getConnection();
-        return preparationTypeDAO.update(conn, item);
+        return preparationTypeDAO.update(DB.conn(), item)==1;
     }
     
     public boolean create( PreparationType item ) {
-        Connection conn = Conexion.getConnection();
-        return preparationTypeDAO.create(conn, item);
+        return preparationTypeDAO.create(DB.conn(), item)==1;
     }
     
     public boolean delete( PreparationType item ) {
-        Connection conn = Conexion.getConnection();
-        return preparationTypeDAO.delete(conn, item.getId());
+        System.out.println(item.getId());
+        return preparationTypeDAO.delete(DB.conn(), item.getId(), true)==1;
     }
 }

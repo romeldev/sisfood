@@ -5,10 +5,10 @@
  */
 package view.setting;
 
-import bo.FoodTypeBO;
+import bo.IngredientTypeBO;
 import common.Helper;
 import common.Validator;
-import entity.FoodType;
+import entity.IngredientType;
 import java.awt.Cursor;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -20,36 +20,53 @@ import view.assets.TableRender;
  *
  * @author HP_RYZEN
  */
-public class FoodTypeView extends javax.swing.JFrame {
+public class IngredientTypeView extends javax.swing.JFrame {
 
     /**
      * Creates new form ComposicionView
      */
-    FoodTypeBO foodTypeBO = new FoodTypeBO();
-    ArrayList<FoodType> list = new ArrayList<>();
-    FoodType item = new FoodType();
+    IngredientTypeBO ingredientTypeBO = new IngredientTypeBO();
+    ArrayList<IngredientType> list = new ArrayList<>();
+    IngredientType item = new IngredientType();
     FoodTypeTM tblModel = new FoodTypeTM();
     
-    public FoodTypeView() {
+    public IngredientTypeView() {
         initComponents();
         txtId.setEnabled(false);
         this.setLocationRelativeTo(null);
-        tblList.getTableHeader().setReorderingAllowed(false) ;
+        setTitle("Tipo de alimento");
+        clearForm();
+        initTable();
+        search();
+    }
+    
+
+    private void initTable(){
         tblList.setModel(tblModel);
-        tblList.setDefaultRenderer(Object.class, new TableRender());
         tblList.setRowHeight(30);
-        fillList();
+        tblList.getTableHeader().setReorderingAllowed(false) ;
+        tblList.setDefaultRenderer(Object.class, new TableRender());
         tblList.getColumnModel().getColumn(0).setMaxWidth(50);
-        tblList.getColumnModel().getColumn(2).setMaxWidth(30);
+        tblList.getColumnModel().getColumn(2).setMaxWidth(50);
         tblList.getColumnModel().getColumn(3).setMaxWidth(30);
         tblList.getColumnModel().getColumn(4).setMaxWidth(30);
     }
     
-    public void fillList()
+    private void search()
     {
-        list = foodTypeBO.list();
+        list = ingredientTypeBO.list();
         tblModel.setData(list);
         tblModel.fireTableDataChanged();
+    }
+    
+    private void clearForm(){
+        item = new IngredientType();
+        txtId.setEnabled(false);
+        txtId.setText(item.getId()+"");
+        txtDescrip.setText(item.getDescrip());
+        txtAbrev.setText(item.getAbrev());
+        btnSave.setText("GUARDAR");
+        btnSave.setIcon(Helper.icon("btn_save"));
     }
     
     public boolean validator()
@@ -242,16 +259,6 @@ public class FoodTypeView extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void clearForm()
-    {
-        item = new FoodType();
-        txtId.setText("");
-        txtDescrip.setText("");
-        txtAbrev.setText("");
-        btnSave.setText("GUARDAR");
-        btnSave.setIcon(Helper.icon("btn_save"));
-    }
     
     private void tblListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblListMouseClicked
         int col = tblList.columnAtPoint(evt.getPoint());
@@ -274,10 +281,10 @@ public class FoodTypeView extends javax.swing.JFrame {
                 if(btn.getName().equals("DELETE")){
                     int confirm = JOptionPane.showConfirmDialog(this, "Eliminar "+item.getDescrip()+"?", "Alerta", JOptionPane.YES_OPTION);
                     if( confirm == JOptionPane.YES_OPTION){
-                        if( foodTypeBO.delete(item) ){
-                            fillList();
+                        if( ingredientTypeBO.delete(item) ){
                             JOptionPane.showMessageDialog(this, item.getDescrip()+" eliminado!");
                             clearForm();
+                            search();
                         }
                     }
                 }
@@ -331,16 +338,16 @@ public class FoodTypeView extends javax.swing.JFrame {
         if(!validator() ) return;
 
         if( id == 0){
-            success = foodTypeBO.create( item );
+            success = ingredientTypeBO.create( item );
             message += " guardado!";
         }else {
-            success = foodTypeBO.update( item );
+            success = ingredientTypeBO.update( item );
             message += " actualizado!";
         }
         if( success ){
-            fillList();
-            clearForm();
             JOptionPane.showMessageDialog(this, message);
+            clearForm();
+            search();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
@@ -361,14 +368,22 @@ public class FoodTypeView extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FoodTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IngredientTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FoodTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IngredientTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FoodTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IngredientTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FoodTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(IngredientTypeView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -381,7 +396,7 @@ public class FoodTypeView extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FoodTypeView().setVisible(true);
+                new IngredientTypeView().setVisible(true);
             }
         });
     }

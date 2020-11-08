@@ -8,6 +8,7 @@ package bo;
 import common.Helper;
 import dao.CompanyDAO;
 import dao.Conexion;
+import dao.DB;
 import entity.Company;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -21,25 +22,19 @@ public class CompanyBO {
     
     private CompanyDAO companyDAO = new CompanyDAO();
     
-    public ArrayList<Company> list()
-    {
-        Connection conn = Conexion.getConnection();
-        ArrayList<Company> list = companyDAO.list(conn);
-        return list;
+    public ArrayList<Company> list(){
+        return companyDAO.list(DB.conn(), true);
     }
     
-    public boolean create( Company item ) {
-        Connection conn = Conexion.getConnection();
-        return companyDAO.create(conn, item);
+    public boolean create( Company item ){
+        return companyDAO.create(DB.conn(), item)==1;
     }
     
     public boolean update( Company item){
-        Connection conn = Conexion.getConnection();
-        return companyDAO.update(conn, item);
+        return companyDAO.update(DB.conn(), item)==1;
     }
     
     public boolean delete( Company item ) {
-        Connection conn = Conexion.getConnection();
-        return companyDAO.delete(conn, item.getId());
+        return companyDAO.delete(DB.conn(), item.getId(), true)==1;
     }
 }

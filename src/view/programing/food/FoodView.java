@@ -3,18 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view.setting;
+package view.programing.food;
 
 import bo.FactorUnitBO;
 import bo.FoodBO;
-import bo.FoodTypeBO;
+import bo.IngredientTypeBO;
 import bo.NutrientBO;
 import bo.UnitTypeBO;
 import common.Helper;
 import common.Validator;
 import entity.FactorUnit;
 import entity.Food;
-import entity.FoodType;
+import entity.IngredientType;
 import entity.Nutrient;
 import entity.UnitType;
 import java.awt.Component;
@@ -43,7 +43,7 @@ public class FoodView extends javax.swing.JFrame {
     String CERO_DECIMAL = ".0";
 
     FoodBO foodBO = new FoodBO();
-    FoodTypeBO foodTypeBO = new FoodTypeBO();
+    IngredientTypeBO foodTypeBO = new IngredientTypeBO();
     UnitTypeBO unitTypeBO = new UnitTypeBO();
     FactorUnitBO factorUnitBO = new FactorUnitBO();
     NutrientBO nutrientBO = new NutrientBO();
@@ -54,7 +54,7 @@ public class FoodView extends javax.swing.JFrame {
     ArrayList<UnitType> units = new ArrayList<>();
     ArrayList<Food> foods = new ArrayList<>();
     ArrayList<HashMap<String, String>> nutrients = Nutrient.Items();
-    ArrayList<FoodType> foodTypes = new ArrayList<>();
+    ArrayList<IngredientType> foodTypes = new ArrayList<>();
     
     FoodSingleTM tblMdlFoods = new FoodSingleTM();
 
@@ -81,17 +81,17 @@ public class FoodView extends javax.swing.JFrame {
     public void fillCbxType(JComboBox cbx){
         cbx.removeAllItems();
         foodTypes = foodTypeBO.list();
-        foodTypes.add(0, new FoodType(0, "Seleccione", null));
-        for (FoodType foodType : foodTypes) {
+        foodTypes.add(0, new IngredientType(0, "Seleccione", null));
+        for (IngredientType foodType : foodTypes) {
             cbx.addItem(foodType);
         }
     }
     //OK
     public void fillCbxTypeSearch(JComboBox cbx){
         cbx.removeAllItems();
-        ArrayList<FoodType> foodTypes = foodTypeBO.list();
-        cbx.addItem(new FoodType(0, "Todos", null));
-        for (FoodType foodType : foodTypes) {
+        ArrayList<IngredientType> foodTypes = foodTypeBO.list();
+        cbx.addItem(new IngredientType(0, "Todos", null));
+        for (IngredientType foodType : foodTypes) {
             cbx.addItem(foodType);
         }
     }
@@ -156,7 +156,7 @@ public class FoodView extends javax.swing.JFrame {
     }
     //OK
     public void searchFood() {
-        int foodTypeId = ((FoodType) cbxFoodTypeSearch.getSelectedItem()).getId();
+        int foodTypeId = ((IngredientType) cbxFoodTypeSearch.getSelectedItem()).getId();
         foods = foodBO.search("descrip", txtSearch.getText(), foodTypeId);
         tblMdlFoods.setData(foods);
         tblMdlFoods.fireTableDataChanged();
@@ -176,7 +176,7 @@ public class FoodView extends javax.swing.JFrame {
 
         int index = 0;
         cbxFoodType.setSelectedIndex(index);
-        for (FoodType foodType : foodTypes) {
+        for (IngredientType foodType : foodTypes) {
             if( foodType.getId() == food.getFoodType().getId()){
                 cbxFoodType.setSelectedIndex(index);
                 break;
@@ -247,7 +247,7 @@ public class FoodView extends javax.swing.JFrame {
 
     public boolean validator()
     {
-        int foodTypeID = ((FoodType)cbxFoodType.getSelectedItem()).getId();
+        int foodTypeID = ((IngredientType)cbxFoodType.getSelectedItem()).getId();
         
         if( foodTypeID==0){
             JOptionPane.showMessageDialog(this, "Seleccione un tipo de comida");
@@ -621,7 +621,7 @@ public class FoodView extends javax.swing.JFrame {
         
         txtId.setText(food.getId()+"");
         food.setId(id);
-        food.setFoodType((FoodType)cbxFoodType.getSelectedItem());
+        food.setFoodType((IngredientType)cbxFoodType.getSelectedItem());
         food.setDescrip(txtDescrip.getText());
         
         HashMap<String, String> foodNutrients = new HashMap<>();
@@ -668,7 +668,7 @@ public class FoodView extends javax.swing.JFrame {
     public void getFillFood()
     {
         HashMap<String, String> item = new HashMap<>();
-        FoodType foodType = (FoodType) cbxFoodTypeSearch.getSelectedItem();
+        IngredientType foodType = (IngredientType) cbxFoodTypeSearch.getSelectedItem();
         
         item.put("id", txtId.getText());
         item.put("food_type_id", foodType.getId()+"");

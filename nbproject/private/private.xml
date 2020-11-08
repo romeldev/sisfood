@@ -4,12 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/assets/PreparationDetailTM.java</file>
-            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/SearchFood.java</file>
-            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/CurrencyTypeView.java</file>
-            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/FoodTypeView.java</file>
-            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/assets/CurrencyTypeTM.java</file>
-            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/FoodView.java</file>
-            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/PreparationView.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/bo/CompanyBO.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/bo/ProfessionalBO.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/dao/CompositionDAO.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/CompositionView.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/view/setting/ProfessionalView.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/dao/ProfessionalDAO.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/bo/PreparationBO.java</file>
+            <file>file:/C:/Users/user/Documents/NetBeansProjects/sisfood/src/dao/CompanyDAO.java</file>
         </group>
     </open-files>
 </project-private>

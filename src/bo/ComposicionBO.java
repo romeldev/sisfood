@@ -5,14 +5,10 @@
  */
 package bo;
 
-import common.Helper;
 import dao.CompositionDAO;
-import dao.Conexion;
+import dao.DB;
 import entity.Composition;
-import java.sql.Connection;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-
 /**
  *
  * @author HP_RYZEN
@@ -21,27 +17,20 @@ public class ComposicionBO {
     
     private CompositionDAO composicionDAO = new CompositionDAO();
     
-    
-    public ArrayList<Composition> list()
-    {
-        Connection conn = Conexion.getConnection();
-        ArrayList<Composition> list = composicionDAO.list(conn);
-        return list;
+    public ArrayList<Composition> list(){
+        return composicionDAO.list(DB.conn(), true);
     }
     
     public boolean update( Composition item){
-        Connection conn = Conexion.getConnection();
-        return composicionDAO.update(conn, item);
+        return composicionDAO.update(DB.conn(), item)==1;
     }
     
     public boolean create( Composition item ) {
-        Connection conn = Conexion.getConnection();
-        return composicionDAO.create(conn, item);
+        return composicionDAO.create(DB.conn(), item)==1;
     }
     
     public boolean delete( Composition item ) {
-        Connection conn = Conexion.getConnection();
-        return composicionDAO.delete(conn, item.getId());
+        return composicionDAO.delete(DB.conn(), item.getId(), true)==1;
     }
 
 }

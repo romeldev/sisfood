@@ -9,20 +9,20 @@ package entity;
  *
  * @author HP_RYZEN
  */
-public class FoodType {
+public class IngredientType {
     
     private int id;
     private String descrip;
     private String abrev;
 
-    public FoodType() {
+    public IngredientType() {
     }
 
-    public FoodType(int id) {
+    public IngredientType(int id) {
         this.id = id;
     }
     
-    public FoodType(int id, String descrip, String abrev) {
+    public IngredientType(int id, String descrip, String abrev) {
         this.id = id;
         this.descrip = descrip;
         this.abrev = abrev;

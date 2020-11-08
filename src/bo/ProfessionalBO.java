@@ -5,14 +5,10 @@
  */
 package bo;
 
-import common.Helper;
+import dao.DB;
 import dao.ProfessionalDAO;
-import dao.Conexion;
 import entity.Professional;
-import java.sql.Connection;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-
 /**
  *
  * @author HP_RYZEN
@@ -21,30 +17,19 @@ public class ProfessionalBO {
     
     private ProfessionalDAO professionalDAO = new ProfessionalDAO();
     
-    public ArrayList<Professional> list()
-    {
-        Connection conn = Conexion.getConnection();
-        ArrayList<Professional> list = null;
-        try {
-            list = Helper.castList(professionalDAO.list(conn));
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-        return list;
+    public ArrayList<Professional> list(){
+        return professionalDAO.list( DB.conn(), true);
     }
     
-    public boolean update( Object item){
-        Connection conn = Conexion.getConnection();
-        return professionalDAO.update(conn, item);
+    public boolean update( Professional item){
+        return professionalDAO.update(DB.conn(), item)==1;
     }
     
-    public boolean create( Object item ) {
-        Connection conn = Conexion.getConnection();
-        return professionalDAO.create(conn, item);
+    public boolean create( Professional item ) {
+        return professionalDAO.create(DB.conn(), item)==1;
     }
     
-    public boolean delete( Object item ) {
-        Connection conn = Conexion.getConnection();
-        return professionalDAO.delete(conn, item);
+    public boolean delete( Professional item ) {
+        return professionalDAO.delete(DB.conn(), item.getId(), true)==1;
     }
 }

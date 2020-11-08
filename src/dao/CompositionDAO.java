@@ -23,15 +23,15 @@ import org.apache.commons.dbutils.DbUtils;
  */
 public class CompositionDAO implements CRUD_FULL<Composition>{
 
-    
     private final String table = "compositions";
     
     @Override
-    public ArrayList<Composition> list(Connection conn) {
+    public ArrayList<Composition> list(Connection conn, boolean soft) {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "select * from "+table;
-        ArrayList<Composition> list = null;
+        if( soft ) sql += " where deleted_at is null";
+        ArrayList<Composition> list = new ArrayList<>();
         
         try {
             ps = conn.prepareStatement(sql);
@@ -58,17 +58,17 @@ public class CompositionDAO implements CRUD_FULL<Composition>{
     }
 
     @Override
-    public Composition read(Connection conn, Integer id) {
+    public Composition read(Connection conn, Integer id, boolean soft) {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "select * from "+table+" where id=?";
-        Composition item = null;
+        if( soft ) sql += " and deleted_at is null";
+        Composition item = new Composition();;
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
             if (rs.next()) {
-                item = new Composition();
                 item.setId( rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
             }
@@ -87,18 +87,18 @@ public class CompositionDAO implements CRUD_FULL<Composition>{
     }
 
     @Override
-    public boolean create(Connection conn, Composition entity) {
-        boolean status = false;
+    public Integer create(Connection conn, Composition entity) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "insert into "+table+" (descrip) ";
         sql += "values(?)";
         try {
-            ps = conn.prepareStatement(sql);
+            ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, entity.getDescrip());
-            ps.execute();
-            ps.close();
-            status = true;
+            status  = ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            if( rs.next()) entity.setId(rs.getInt(1));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -114,8 +114,8 @@ public class CompositionDAO implements CRUD_FULL<Composition>{
     }
 
     @Override
-    public boolean update(Connection conn, Composition entity) {
-        boolean status = false;
+    public Integer update(Connection conn, Composition entity) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "update "+table+" set descrip=? where id=?";
@@ -123,9 +123,7 @@ public class CompositionDAO implements CRUD_FULL<Composition>{
             ps = conn.prepareStatement(sql);
             ps.setString(1, entity.getDescrip());
             ps.setInt(2, entity.getId());
-            ps.execute();
-            ps.close();
-            status = true;
+            status  = ps.executeUpdate();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -141,17 +139,17 @@ public class CompositionDAO implements CRUD_FULL<Composition>{
     }
 
     @Override
-    public boolean delete(Connection conn, Integer id) {
-        boolean status = false;
+    public Integer delete(Connection conn, Integer id, boolean soft) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "delete from "+table+" where id=?";
+        if( soft ) sql = "update "+table+" set deleted_at=CURRENT_TIMESTAMP where id=?";
+
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
-            ps.execute();
-            ps.close();
-            status = true;
+            status  = ps.executeUpdate();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {

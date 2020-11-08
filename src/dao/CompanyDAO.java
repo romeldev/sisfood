@@ -23,36 +23,26 @@ import org.apache.commons.dbutils.DbUtils;
  */
 public class CompanyDAO implements CRUD_FULL<Company>{
     
-    public static void main(String[] args) {
-        Connection conn = Conexion.getConnection();
-        
-        CompanyDAO dao = new CompanyDAO();
-        
-        for (int i = 0; i < 20; i++) {
-            System.out.println( dao.list(Conexion.getConnection()) );
-        }
-    }
+    private final String table = "companies";
     
-    private String table = "companies";
+    public boolean softdelete = true;
 
     @Override
-    public ArrayList<Company> list(Connection conn) {
+    public ArrayList<Company> list(Connection conn, boolean soft) {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "select * from "+table;
-        ArrayList<Company> list = null;
+        if( soft ) sql += " where deleted_at is null";
+        ArrayList<Company> list = new ArrayList<>();
         try {
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            list = new ArrayList<>();
             while (rs.next()) {
                 Company item = new Company();
                 item.setId(rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
                 list.add(item);
             }
-            ps.close();
-            conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -68,21 +58,20 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     }
 
     @Override
-    public Company read(Connection conn, Integer id) {
+    public Company read(Connection conn, Integer id, boolean soft) {
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "select * from "+table+" where id=?";
-        Company item = null;
+        if( soft ) sql += " and deleted_at is null";
+        Company item = new Company();
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            item = new Company();
             if (rs.next()) {
                 item.setId(rs.getInt("id"));
                 item.setDescrip(rs.getString("descrip"));
             }
-            conn.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -98,20 +87,17 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     }
 
     @Override
-    public boolean create(Connection conn, Company entity) {
-        boolean status = false;
+    public Integer create(Connection conn, Company entity) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "insert into "+table+" (descrip) values (?)";
         try {
             ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, entity.getDescrip());
-            int rows  = ps.executeUpdate();
+            status  = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if( rs.next()) entity.setId(rs.getInt(1));
-            
-            conn.close();
-            status = true;
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -127,8 +113,8 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     }
 
     @Override
-    public boolean update(Connection conn, Company entity) {
-        boolean status = false;
+    public Integer update(Connection conn, Company entity) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "update "+table+" set descrip=? where id=?";
@@ -136,9 +122,7 @@ public class CompanyDAO implements CRUD_FULL<Company>{
             ps = conn.prepareStatement(sql);
             ps.setString(1, entity.getDescrip());
             ps.setInt(2, entity.getId());
-            ps.execute();
-            ps.close();
-            status = true;
+            status  = ps.executeUpdate();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {
@@ -154,17 +138,17 @@ public class CompanyDAO implements CRUD_FULL<Company>{
     }
 
     @Override
-    public boolean delete(Connection conn, Integer id) {
-        boolean status = false;
+    public Integer delete(Connection conn, Integer id, boolean soft) {
+        Integer status = 0;
         PreparedStatement ps = null;
         ResultSet rs = null;
         String sql = "delete from "+table+" where id=?";
+        if( soft ) sql = "update "+table+" set deleted_at=CURRENT_TIMESTAMP where id=?";
+        
         try {
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
-            ps.execute();
-            ps.close();
-            status = true;
+            status  = ps.executeUpdate();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         } finally {

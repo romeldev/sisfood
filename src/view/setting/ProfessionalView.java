@@ -34,26 +34,43 @@ public class ProfessionalView extends javax.swing.JFrame {
         initComponents();
         txtId.setEnabled(false);
         this.setLocationRelativeTo(null);
-        tblList.getTableHeader().setReorderingAllowed(false) ;
+        setTitle("Professionals");
+        clearForm();
+        initTable();
+        search();
+    }
+    
+    
+    private void initTable(){
         tblList.setModel(tblModel);
-        tblList.setDefaultRenderer(Object.class, new TableRender());
         tblList.setRowHeight(30);
-        fillList();
+        tblList.getTableHeader().setReorderingAllowed(false) ;
+        tblList.setDefaultRenderer(Object.class, new TableRender());
         tblList.getColumnModel().getColumn(0).setMaxWidth(50);
         tblList.getColumnModel().getColumn(3).setMaxWidth(50);
         tblList.getColumnModel().getColumn(4).setMaxWidth(30);
         tblList.getColumnModel().getColumn(5).setMaxWidth(30);
     }
     
-    public void fillList()
+    private void search()
     {
         list = professionalBO.list();
         tblModel.setData(list);
         tblModel.fireTableDataChanged();
     }
     
-    public boolean validator()
-    {
+    private void clearForm(){
+        item = new Professional();
+        txtId.setText("");
+        txtFullname.setText("");
+        txtProfession.setText("");
+        txtCode.setText("");
+        btnSave.setText("GUARDAR");
+        btnSave.setIcon(Helper.icon("btn_save"));
+    }
+    
+    
+    public boolean validator(){
         if( !Validator.isRequired(txtFullname.getText())){
             JOptionPane.showMessageDialog(this, "Ingrese nombre y apellidos");
             txtFullname.requestFocus();
@@ -264,17 +281,6 @@ public class ProfessionalView extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void clearForm()
-    {
-        item = new Professional();
-        txtId.setText("");
-        txtFullname.setText("");
-        txtProfession.setText("");
-        txtCode.setText("");
-        btnSave.setText("GUARDAR");
-        btnSave.setIcon(Helper.icon("btn_save"));
-    }
     
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         clearForm();
@@ -312,7 +318,7 @@ public class ProfessionalView extends javax.swing.JFrame {
                     int confirm = JOptionPane.showConfirmDialog(this, "Eliminar "+item.getFullname()+"?", "Alerta", JOptionPane.YES_OPTION);
                     if( confirm == JOptionPane.YES_OPTION){
                         if( professionalBO.delete(item) ){
-                            fillList();
+                            search();
                             JOptionPane.showMessageDialog(this, item.getFullname()+" eliminado!");
                             clearForm();
                         }
@@ -359,9 +365,9 @@ public class ProfessionalView extends javax.swing.JFrame {
             message += " actualizado!";
         }
         if( success ){
-            fillList();
-            clearForm();
             JOptionPane.showMessageDialog(this, message);
+            clearForm();
+            search();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 

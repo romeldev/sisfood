@@ -5,14 +5,10 @@
  */
 package bo;
 
-import common.Helper;
 import dao.CurrencyTypeDAO;
-import dao.Conexion;
+import dao.DB;
 import entity.CurrencyType;
-import java.sql.Connection;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-
 /**
  *
  * @author HP_RYZEN
@@ -23,28 +19,18 @@ public class CurrencyTypeBO {
     
     public ArrayList<CurrencyType> list()
     {
-        Connection conn = Conexion.getConnection();
-        ArrayList<CurrencyType> list = null;
-        try {
-            list = Helper.castList(currencyTypeDAO.list(conn));
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-        return list;
+        return currencyTypeDAO.list(DB.conn(), true);
     }
     
-    public boolean update( Object item){
-        Connection conn = Conexion.getConnection();
-        return currencyTypeDAO.update(conn, item);
+    public boolean update( CurrencyType item){
+        return currencyTypeDAO.update(DB.conn(), item)==1;
     }
     
-    public boolean create( Object item ) {
-        Connection conn = Conexion.getConnection();
-        return currencyTypeDAO.create(conn, item);
+    public boolean create( CurrencyType item ) {
+        return currencyTypeDAO.create(DB.conn(), item)==1;
     }
     
-    public boolean delete( Object item ) {
-        Connection conn = Conexion.getConnection();
-        return currencyTypeDAO.delete(conn, item);
+    public boolean delete( CurrencyType item ) {
+        return currencyTypeDAO.delete(DB.conn(), item.getId(), true)==1;
     }
 }
